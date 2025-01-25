@@ -1,0 +1,133 @@
+/* ---------------------- Lado izquierdo ---------------------- */
+.container {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+
+.sidebar {
+    display: flex;
+
+    flex-direction: column;
+    grid-column: span 2;
+    
+    border-right: 1px solid rgb(203, 203, 203);
+
+    padding: 0%;
+
+    background-color: white;
+}
+.areaDatos {
+    margin: auto;
+    margin-left: 0%;
+    margin-right: 0%;
+}
+.botonDatos {
+    text-align: center;
+
+    margin-left: auto;
+    margin-right: auto;
+
+    padding: 15px;
+
+    background-color: #a9a9a9;
+    color: black;
+}
+.botonLogout {
+    text-align: center;
+
+    padding: 15px;
+
+    background-color: gray;
+}
+
+
+/* ---------------------- Lado derecho ---------------------- */
+.data {
+    display: flex;
+    flex-direction: column;
+
+    grid-column: span 5;
+
+    padding: 10px;
+
+    gap: 10px;
+}
+
+
+.cabecera {
+    display: flex;
+    flex-direction: row;
+
+    justify-content: space-between;
+
+    padding: 10px;
+
+    border: 1px black solid;
+    border-radius: 4px;
+}
+
+
+.searchBar {
+    display: flex;
+    flex-direction: row;
+
+    background-color: #EEEEEE;
+    border: 1px black solid;
+    border-radius: 4px;
+}
+.lupaSearchBar {
+    display: flex;
+    align-items: center;
+    
+}
+.inputSearchBar {
+    border: none;
+
+    background-color: #EEEEEE;
+
+    border-top-left-radius: 0%;
+    border-bottom-left-radius: 0%;
+}
+.buttonSearchBar {
+    width: 8%;
+
+    border-top-left-radius: 0%;
+    border-bottom-left-radius: 0%;
+    border-left: 1px black solid;
+
+    background-color: #EEEEEE;
+    color: black;
+}
+
+/* Datos */
+.usersDataContainer {
+    display: flex;
+    flex-direction: column;
+
+}
+
+.userData {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    border: 1px black solid;
+    border-radius: 4px;
+}
+
+.numeracion {
+    
+}
+.nombreApellido {
+
+}
+.username {
+
+}
+.userEmail {
+
+}
+.verAsistencias {
+
+}

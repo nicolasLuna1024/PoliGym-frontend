@@ -1,10 +1,11 @@
 import React from 'react'
+
 import { Outlet } from 'react-router-dom';
 
-const AdminLayout = () => {
+const AuthLayout = () => {
     return (
         <Outlet></Outlet>
     )
 }
 
-export default AdminLayout;
+export default AuthLayout;

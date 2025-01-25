@@ -8,3 +8,4 @@ export default defineConfig({
     tailwindcss(), // Plugin de Tailwind CSS
   ],
 })
+

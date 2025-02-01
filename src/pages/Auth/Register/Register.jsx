@@ -1,94 +1,82 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "./Register.css";
+import { toast, ToastContainer } from "react-toastify";
 
 const Register = () => {
     const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
+        username: "",
+        name: "",
+        lastname: "",
         email: "",
         password: "",
         confirmPassword: "",
     });
-    const [errors, setErrors] = useState({});
-    const [successMessage, setSuccessMessage] = useState("");
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
-
-    const validateForm = () => {
-        const newErrors = {};
-        if (!formData.firstName.trim()) {
-            newErrors.firstName = "El nombre es obligatorio.";
-        }
-        if (!formData.lastName.trim()) {
-            newErrors.lastName = "El apellido es obligatorio.";
-        }
-        if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = "El correo electrónico no es válido.";
-        }
-        if (formData.password.length < 6) {
-            newErrors.password = "La contraseña debe tener al menos 6 caracteres.";
-        }
-        if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = "Las contraseñas no coinciden.";
-        }
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0; // Si no hay errores, el formulario es válido
+        setFormData({ 
+            ...formData, 
+            [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (validateForm()) {
-            try {
-                const response = await axios.post("http://tu-backend.com/api/register", {
-                    firstName: formData.firstName,
-                    lastName: formData.lastName,
-                    email: formData.email,
-                    password: formData.password,
-                });
-                console.log("Registro exitoso:", response.data);
-                setSuccessMessage("Registro exitoso. Ahora puedes iniciar sesión.");
-                setFormData({
-                    firstName: "",
-                    lastName: "",
-                    email: "",
-                    password: "",
-                    confirmPassword: "",
-                });
-            } catch (err) {
-                console.error("Error al registrar:", err);
-                setErrors({ apiError: "Error al registrar. Inténtalo más tarde." });
-            }
+        console.log(formData)
+        try {
+            const url = `${import.meta.env.VITE_BACKEND_URL}/auth/register`
+            const respuesta = await axios.post(url, {...formData});
+        
+            setFormData({
+                username: "",
+                name: "",
+                lastname: "",
+                email: "",
+                password: "",
+                confirmPassword: "",
+            });
+            
+            toast.success(respuesta.data.msg);
+        } catch (err) {
+            toast.error("Error al registrarse");
         }
-    }; S
+    };
 
     return (
         <div className="register-container">
+            <ToastContainer/>
             <form className="register-form" onSubmit={handleSubmit}>
                 <h2>Registro</h2>
-                {error && <p className="error-message">{error}</p>}
                 <div className="form-group">
-                    <label htmlFor="firstName">Nombre:</label>
+                    <label htmlFor="name">Nombre:</label>
                     <input
                         type="text"
-                        id="firstName"
-                        name="firstName"
-                        value={formData.firstName}
+                        id="name"
+                        name="name"
+                        value={formData.name}
                         onChange={handleChange}
                         required
                         placeholder="John"
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="lastName">Apellido:</label>
+                    <label htmlFor="lastname">Apellido:</label>
                     <input
                         type="text"
-                        id="lastName"
-                        name="lastName"
-                        value={formData.lastName}
+                        id="lastname"
+                        name="lastname"
+                        value={formData.lastname}
+                        onChange={handleChange}
+                        required
+                        placeholder="Doe"
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="username">Username:</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        value={formData.username}
                         onChange={handleChange}
                         required
                         placeholder="Doe"

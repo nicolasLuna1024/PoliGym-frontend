@@ -1,36 +1,42 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import "./login.css";
+import AuthContext from "../../../contexts/AuthProvider";
+import { toast, ToastContainer } from "react-toastify";
 
 const Login = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-    const navigate = useNavigate();
+    const [form, setForm] = useState({
+        email: "",
+        password: ""
+    })
 
+    const { setAuth } = useContext(AuthContext)
+
+    const handleChange = (e) => {
+        setForm ({
+            ...form,
+            [e.target.name]: e.target.value
+        })
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post("http://localhost:7001/api/login", {
-                email,
-                password,
-            });
+            const url = `${import.meta.env.VITE_BACKEND_URL}/auth/login`
 
-            const { token } = response.data; // Asegúrate de que tu backend envíe el token en esta propiedad
-            localStorage.setItem("authToken", token); // Guarda el token en localStorage
-            console.log("Login exitoso, token guardado:", token);
+            const respuesta = await axios.post(url, {...form})
 
-            navigate("/"); // Redirige a una página protegida, por ejemplo, un dashboard
-        } catch (err) {
-            console.error("Error durante el inicio de sesión:", err);
-            setError("Credenciales inválidas. Por favor, intenta nuevamente.");
+            setAuth(respuesta.data);
+            toast.success("Inicio de sesión satisfactorio")
+        } catch (error) {
+            toast.error("Error al iniciar sesión")
         }
-    };
+    }
 
     return (
         <div className="login-container">
+            <ToastContainer/>
             <form className="login-form" onSubmit={handleSubmit}>
                 <h2>Iniciar Sesión</h2>
                 <div className="form-group">
@@ -38,8 +44,9 @@ const Login = () => {
                     <input
                         type="email"
                         id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        name="email"
+                        value={form.email}
+                        onChange={handleChange}
                         required
                         placeholder="ejemplo@email.com"
                     />
@@ -48,9 +55,9 @@ const Login = () => {
                     <label htmlFor="password">Contraseña:</label>
                     <input
                         type="password"
-                        id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        name="password"
+                        value={form.password}
+                        onChange={handleChange}
                         required
                         placeholder="********"
                     />

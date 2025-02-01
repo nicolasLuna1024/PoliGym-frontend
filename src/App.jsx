@@ -19,6 +19,7 @@ import EntrenadorAsistencias from "./pages/Entrenador/EntrenadorAsistencias/Entr
 
 // import Navbar from "./components/navegacion/navbar.jsx";
 import ClienteEntrenamientos from "./pages/Cliente/ClienteEntrenamientos/ClienteEntrenamientos.jsx";
+import { AuthProvider } from "./contexts/AuthProvider.jsx";
 
 const router = createBrowserRouter([
     {
@@ -28,12 +29,15 @@ const router = createBrowserRouter([
 
     {
         path: "/auth",
-        element: <AuthLayout></AuthLayout>,
+        element: (
+            <AuthProvider> 
+                <AuthLayout/> 
+            </AuthProvider>),
         errorElement: <NotFound></NotFound>,
         children: [
             {
                 path: "/auth/login",
-                element: <Login></Login>
+                element: <Login/>
             },
             {
                 path: "/auth/register",

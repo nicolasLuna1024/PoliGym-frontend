@@ -1,42 +1,37 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./recover.css";
+import "./Recover.css";
+import { toast, ToastContainer } from "react-toastify";
 
 const ForgotPassword = () => {
-    const [email, setEmail] = useState("");
-    const [message, setMessage] = useState("");
-    const [error, setError] = useState("");
+    const [email, setEmail] = useState({});
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-
+        e.preventDefault()
         try {
-            // Realiza la solicitud al backend
-            const response = await axios.post("http://localhost:7001/api/recovery", { email });
+            const url = `${import.meta.env.VITE_BACKEND_URL}/auth/recovery-password-mailing`
 
-            // Mostrar un mensaje de confirmación basado en la respuesta del servidor
-            setMessage("Si este correo está registrado, recibirás un enlace para restablecer tu contraseña.");
-            setError("");
-        } catch (err) {
-            console.error("Error al solicitar la recuperación:", err);
-            setError("Ocurrió un error al procesar la solicitud. Intenta nuevamente.");
-            setMessage("");
+            await axios.post(url, email)
+
+            toast.success("Correo de restauración enviado")
+        } catch (error) {
+            toast.error("Error al enviar el correo de restauración")
         }
-    };
+    }
 
     return (
         <div className="forgot-password-container">
+            <ToastContainer/>
             <form className="forgot-password-form" onSubmit={handleSubmit}>
                 <h2>Recuperar Contraseña</h2>
-                {message && <p className="success-message">{message}</p>}
                 <div className="form-group">
                     <label htmlFor="email">Correo Electrónico:</label>
                     <input
                         type="email"
                         id="email"
                         name="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={email.email}
+                        onChange={(e) => setEmail({email: e.target.value})}
                         required
                         placeholder="ejemplo@email.com"
                     />

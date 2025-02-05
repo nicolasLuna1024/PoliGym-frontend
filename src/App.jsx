@@ -20,6 +20,8 @@ import EntrenadorAsistencias from "./pages/Entrenador/EntrenadorAsistencias/Entr
 // import Navbar from "./components/navegacion/navbar.jsx";
 import ClienteEntrenamientos from "./pages/Cliente/ClienteEntrenamientos/ClienteEntrenamientos.jsx";
 import { AuthProvider } from "./contexts/AuthProvider.jsx";
+import Confirmar from "./pages/Auth/confirmEmail/Confirmar.jsx";
+import Restablecer from "./pages/Auth/SetNewPassword/Restablecer.jsx";
 
 const router = createBrowserRouter([
     {
@@ -33,36 +35,25 @@ const router = createBrowserRouter([
             <AuthProvider> 
                 <AuthLayout/> 
             </AuthProvider>),
-        errorElement: <NotFound></NotFound>,
+        errorElement: <NotFound/>,
         children: [
-            {
-                path: "/auth/login",
-                element: <Login/>
-            },
-            {
-                path: "/auth/register",
-                element: <Register></Register>
-            },
-            {
-                path: "/auth/recovery",
-                element: <Recover></Recover>
-            }
+            { path: "login", element: <Login/> },
+            { path: "register", element: <Register/> },
+            { path: "confirm/:token", element: <Confirmar/>},
+            { path: "recovery", element: <Recover/> },
+            
+            //Ojo
+            { path: "recovery-password/:token", element: <Restablecer/> }
         ]
     },
 
     //Ruteo de la página admin
     {
-        path: "/admin",
+        path: "/admin/*",
         element: <AdminLayout></AdminLayout>,
         children: [
-            {
-                path: "/admin",
-                element: <GestionUsuarios></GestionUsuarios>
-            },
-            {
-                path: "/admin/add",
-                element: <Admin_newClient></Admin_newClient>
-            }/*,
+            { path: "", element: <GestionUsuarios></GestionUsuarios> },
+            { path: "add", element: <Admin_newClient></Admin_newClient> }/*,
       {
         path: "/admin/delete"
       },
@@ -76,7 +67,7 @@ const router = createBrowserRouter([
 
     //Ruteo de las páginas entrenador
     {
-        path: "/entrenador",
+        path: "entrenador",
         element: <EntrenadorAsistencias></EntrenadorAsistencias>,
         children: [
             {}
@@ -85,8 +76,9 @@ const router = createBrowserRouter([
 
     //Ruteo de las páginas cliente
     {
-        path: "/cliente",
-        element: <ClienteEntrenamientos></ClienteEntrenamientos>,
+        path: "cliente",
+
+        element: <AuthProvider> <ClienteEntrenamientos/> </AuthProvider>,
         children: [
             {}
         ]

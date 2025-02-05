@@ -1,17 +1,19 @@
 import React, { useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./login.css";
 import AuthContext from "../../../contexts/AuthProvider";
 import { toast, ToastContainer } from "react-toastify";
 
 const Login = () => {
+    const navigate = useNavigate();
+
     const [form, setForm] = useState({
         email: "",
         password: ""
     })
 
-    const { setAuth } = useContext(AuthContext)
+    const { setAuth, setToken, auth, token } = useContext(AuthContext)
 
     const handleChange = (e) => {
         setForm ({
@@ -22,15 +24,24 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+    
         try {
-            const url = `${import.meta.env.VITE_BACKEND_URL}/auth/login`
+            const url = `http://localhost:3000/api/auth/login`
 
-            const respuesta = await axios.post(url, {...form})
+            const respuesta = await axios.post(url, form, {withCredentials:true})
 
             setAuth(respuesta.data);
-            toast.success("Inicio de sesión satisfactorio")
+            setToken(respuesta.data.token)
+            
+            
+
+            console.log("Auth: ", respuesta.data)
+            console.log(respuesta.data.token)
+            
+            navigate("/cliente")
         } catch (error) {
             toast.error("Error al iniciar sesión")
+            //console.log(error)
         }
     }
 

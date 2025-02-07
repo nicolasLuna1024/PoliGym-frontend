@@ -22,6 +22,8 @@ import ClienteEntrenamientos from "./pages/Cliente/ClienteEntrenamientos/Cliente
 import { AuthProvider } from "./contexts/AuthProvider.jsx";
 import Confirmar from "./pages/Auth/confirmEmail/Confirmar.jsx";
 import Restablecer from "./pages/Auth/SetNewPassword/Restablecer.jsx";
+import ClienteProgresos from "./pages/Cliente/ClienteProgresos/ClienteProgresos.jsx";
+import ClienteLayout from "./pages/Cliente/ClienteLayout/ClienteLayout.jsx";
 
 const router = createBrowserRouter([
     {
@@ -37,7 +39,7 @@ const router = createBrowserRouter([
             </AuthProvider>),
         errorElement: <NotFound/>,
         children: [
-            { path: "login", element: <Login/> },
+            { path: "login", element: <AuthProvider> <Login/> </AuthProvider>},
             { path: "register", element: <Register/> },
             { path: "confirm/:token", element: <Confirmar/>},
             { path: "recovery", element: <Recover/> },
@@ -78,9 +80,22 @@ const router = createBrowserRouter([
     {
         path: "cliente",
 
-        element: <AuthProvider> <ClienteEntrenamientos/> </AuthProvider>,
+        element: 
+            <AuthProvider> 
+                <ClienteLayout/> 
+            </AuthProvider>,
         children: [
-            {}
+            {
+                path: "progresos/:username",
+                element: <AuthProvider> 
+                    <ClienteProgresos></ClienteProgresos>
+                </AuthProvider>
+            },
+            {
+                path: "entrenamientos",
+                element: <ClienteEntrenamientos></ClienteEntrenamientos>
+            }
+
         ]
     }
 ])

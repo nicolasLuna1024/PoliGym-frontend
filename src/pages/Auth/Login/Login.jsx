@@ -7,7 +7,6 @@ import { toast, ToastContainer } from "react-toastify";
 
 const Login = () => {
     const navigate = useNavigate();
-
     const [form, setForm] = useState({
         email: "",
         password: ""
@@ -26,21 +25,29 @@ const Login = () => {
         e.preventDefault();
     
         try {
-            const url = `http://localhost:3000/api/auth/login`
-
+            const url = `${import.meta.env.VITE_BACKEND_URL}/auth/login`
             const respuesta = await axios.post(url, form, {withCredentials:true})
+            //Extrae el token y los datos de autenticacións
+            const {token: newToken, user} = respuesta.data
+            //Alamacena el token en el contexto
+            setAuth({ ...auth, user });
+            setToken(newToken);
+            //Almacena el token en el local storage
+            localStorage.setItem("token", newToken);
 
-            setAuth(respuesta.data);
-            setToken(respuesta.data.token)
-            
-            
+            // setAuth(respuesta.data);
+            // setToken(respuesta.data.token)
 
+            // Muestra un mensaje de éxito
+            toast.success("Inicio de sesión exitoso");
+            
             console.log("Auth: ", respuesta.data)
             console.log(respuesta.data.token)
-            
+            //Redirige a la página de cliente
             navigate("/cliente")
         } catch (error) {
-            toast.error("Error al iniciar sesión")
+            toast.error("Error al iniciar sesión:",error);
+            toast.error("Creedenciales incorrectas");
             //console.log(error)
         }
     }

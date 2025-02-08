@@ -14,6 +14,13 @@ const ClienteProgresos = () => {
     const [dateStart, setDateStart] = useState('');
     const [dateEnd, setDateEnd] = useState('');
     const [details, setDetails] = useState([{ name: '', measure: '' }]);
+    const [notification, setNotification] = useState(null); // Estado para manejar notificaciones
+
+    // Función para mostrar notificaciones
+    const showNotification = (type, message) => {
+        setNotification({ type, message });
+        setTimeout(() => setNotification(null), 5000); // Ocultar notificación después de 5 segundos
+    };
 
     // Obtener los datos de progreso del backend
     useEffect(() => {
@@ -30,7 +37,7 @@ const ClienteProgresos = () => {
                 setProgresos(respuesta.data);
             } catch (error) {
                 console.error("Error al obtener los progresos", error);
-                toast.error("No se pudieron cargar los progresos. Inténtalo de nuevo.");
+                showNotification('error', "No se pudieron cargar los progresos.");
             }
         };
         fetchProgresos();
@@ -81,7 +88,7 @@ const ClienteProgresos = () => {
 
         if (!isValidDetails) {
             console.error("Los detalles no son válidos:", details);
-            toast.error("Los detalles ingresados no son válidos.");
+            showNotification('error', "Los detalles ingresados no son válidos.");
             return;
         }
 
@@ -113,9 +120,11 @@ const ClienteProgresos = () => {
                 updatedProgresos[editIndex] = respuesta.data;
                 setProgresos(updatedProgresos);
                 setEditIndex(null);
+                showNotification('success', "Entrada actualizada correctamente.");
             } else {
                 // Agregar nueva entrada
                 setProgresos([...progresos, respuesta.data]);
+                showNotification('success', "Entrada agregada correctamente.");
             }
 
             // Limpiar campos
@@ -123,13 +132,12 @@ const ClienteProgresos = () => {
             setDateEnd('');
             setDetails([{ name: '', measure: '' }]);
             setIsModalOpen(false);
-            toast.success(editIndex !== null ? "Entrada actualizada correctamente" : "Entrada agregada correctamente");
         } catch (error) {
             console.error("Error al guardar la entrada", error);
             if (error.response) {
                 const { msg, errores } = error.response.data;
                 console.error("Respuesta del backend:", { msg, errores });
-                toast.error(msg || "No se pudo guardar la entrada. Inténtalo de nuevo.");
+                showNotification('error', msg || "No se pudo guardar la entrada.");
             }
         }
     };
@@ -159,15 +167,74 @@ const ClienteProgresos = () => {
             await axios.delete(url, options);
             const updatedProgresos = progresos.filter((_, i) => i !== index);
             setProgresos(updatedProgresos);
-            toast.success("Entrada eliminada correctamente");
+            showNotification('success', "Entrada eliminada correctamente.");
         } catch (error) {
             console.error("Error al eliminar la entrada", error);
-            toast.error("No se pudo eliminar la entrada. Inténtalo de nuevo.");
+            showNotification('error', "No se pudo eliminar la entrada.");
         }
     };
 
     return (
         <div style={styles.container}>
+            {/* Notificación */}
+            {notification && (
+                <div role="alert" className={`rounded-xl border p-4 mb-4 ${notification.type === 'success' ? 'border-gray-100 bg-white text-green-600' : 'border-red-500 bg-red-50 text-red-800'}`}>
+                    <div className="flex items-start gap-4">
+                        <span>
+                            {notification.type === 'success' ? (
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth="1.5"
+                                    stroke="currentColor"
+                                    className="size-5"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                </svg>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-5">
+                                    <path
+                                        fillRule="evenodd"
+                                        d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z"
+                                        clipRule="evenodd"
+                                    />
+                                </svg>
+                            )}
+                        </span>
+                        <div className="flex-1">
+                            <strong className="block font-medium">
+                                {notification.type === 'success' ? 'Cambios guardados' : 'Algo salió mal'}
+                            </strong>
+                            <p className={`mt-1 text-sm ${notification.type === 'success' ? 'text-gray-700' : 'text-red-700'}`}>
+                                {notification.message}
+                            </p>
+                        </div>
+                        <button
+                            className="text-gray-500 hover:text-gray-600 transition focus:outline-none"
+                            onClick={() => setNotification(null)}
+                            style={{ padding: '2px', margin: '0', width: '45px', height: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} // Ajuste de padding y margen
+                        >
+                            <span className="sr-only">Dismiss popup</span>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth="1.5"
+                                stroke="black"
+                                className="size-6"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Título */}
             <h1 style={styles.title}>Registro de Progreso</h1>
 

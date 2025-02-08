@@ -8,7 +8,7 @@ import NotFound from "./pages/NotFound/NotFound.jsx";
 
 import Login from "./pages/Auth/Login/Login.jsx";
 import Register from "./pages/Auth/Register/Register.jsx";
-import Recover from "./pages/Auth/Recover/Recover.jsx";
+import ForgotPassword from "./pages/Auth/ForgotPassword/ForgotPassword.jsx";
 import AuthLayout from "./pages/Auth/AuthLayout/AuthLayout.jsx";
 
 import GestionUsuarios from "./pages/Admin/AdminGestionUsuarios/GestionUsuarios.jsx";
@@ -21,7 +21,7 @@ import EntrenadorAsistencias from "./pages/Entrenador/EntrenadorAsistencias/Entr
 import ClienteEntrenamientos from "./pages/Cliente/ClienteEntrenamientos/ClienteEntrenamientos.jsx";
 import { AuthProvider } from "./contexts/AuthProvider.jsx";
 import Confirmar from "./pages/Auth/confirmEmail/Confirmar.jsx";
-import Restablecer from "./pages/Auth/SetNewPassword/Restablecer.jsx";
+import ConfirmToken from "./pages/Auth/ConfirmToken/ConfirmToken.jsx";
 import ClienteProgresos from "./pages/Cliente/ClienteProgresos/ClienteProgresos.jsx";
 import ClienteLayout from "./pages/Cliente/ClienteLayout/ClienteLayout.jsx";
 
@@ -42,10 +42,10 @@ const router = createBrowserRouter([
             { path: "login", element: <AuthProvider> <Login/> </AuthProvider>},
             { path: "register", element: <Register/> },
             { path: "confirm/:token", element: <Confirmar/>},
-            { path: "recovery", element: <Recover/> },
+            { path: "recovery", element: <ForgotPassword/> },
             
             //Ojo
-            { path: "recovery-password/:token", element: <Restablecer/> }
+            { path: "recovery-password", element: <ConfirmToken/> }
         ]
     },
 

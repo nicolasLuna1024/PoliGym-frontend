@@ -25,8 +25,8 @@ const Login = () => {
         e.preventDefault();
     
         try {
-            const url = `${import.meta.env.VITE_BACKEND_URL}/auth/login`
-            const respuesta = await axios.post(url, form, {withCredentials:true})
+            const url = `${import.meta.env.VITE_BACKEND_URL}auth/login`
+            const respuesta = await axios.post(url, form)
             //Extrae el token y los datos de autenticacións
             const {token: newToken, user} = respuesta.data
             //Alamacena el token en el contexto

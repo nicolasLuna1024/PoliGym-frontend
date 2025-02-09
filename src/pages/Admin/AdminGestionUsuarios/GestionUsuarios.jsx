@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
     FaEdit,
     FaTrash,
@@ -9,92 +9,216 @@ import {
 import "./GestionUsuarios.css";
 import { DiVim } from "react-icons/di";
 import { BiColor } from "react-icons/bi";
+import AuthContext from "../../../contexts/AuthProvider";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+
+
+const baseFormState = {
+    name: "",
+    lastname: "",
+    username: "",
+    email: "",
+    password: ""
+}
+
 
 const GestionUsuarios = () => {
-    const [users, setUsers] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const rowsPerPage = 10;
+    const { auth, token } = useContext(AuthContext)
+
+    console.log("token: ", token, "auth: ", auth)
+
+    //Para el post, put y delete
+    const [form, setForm] = useState({
+        name: "",
+        lastname: "",
+        username: "",
+        email: "",
+        password: ""
+    })
+    //Para el get
+    const [users, setUsers] = useState([])
+    
+    //Paginación
+    const [currentPage, setCurrentPage] = useState(1)
+    const rowsPerPage = 10
 
     {
-        /* Modal Add */
+        /* Modal de agregación */
     }
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false)
 
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
+    const openModal = () => setIsModalOpen(true)
+    const closeModal = () => setIsModalOpen(false)
 
     {
-        /* Modal Edit */
+        /* Modal de actualización */
     }
-    const [isModalOpenEdit, setIsModalOpenEdit] = useState(false);
+    const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null)
+    const [isModalOpenEdit, setIsModalOpenEdit] = useState(false)
 
-    const openModalEdit = () => setIsModalOpenEdit(true);
-    const closeModalEdit = () => setIsModalOpenEdit(false);
+    const openModalEdit = (userId) => {
+        setIsModalOpenEdit(true);
+        const usuario = users.find(user => user._id === userId);
+
+        console.log("###############################", usuario)
+        
+        if (!usuario) return; // Evita errores si el usuario no se encuentra
+    
+        setUsuarioSeleccionado(usuario);
+        
+        setForm({
+            name: usuario.name || "",
+            lastname: usuario.lastname || "",
+            username: usuario.username || "",
+            email: usuario.email || "",
+            password: "", // No se autocompleta por seguridad
+            confirmPassword: "" // No se autocompleta por seguridad
+        });
+    };
+    
+    
+
+    const closeModalEdit = () => {
+        setIsModalOpenEdit(false)
+        setForm(baseFormState)
+        setUsuarioSeleccionado({})
+    }
 
     {
-        /* Modal Delete */
+        /* Modal de eliminación */
     }
-    const [isModalOpenDelete, setIsModalOpenDelete] = useState(false);
+    const [isModalOpenDelete, setIsModalOpenDelete] = useState(false)
 
-    const openModalDelete = () => setIsModalOpenDelete(true);
-    const closeModalDelete = () => setIsModalOpenDelete(false);
+    const openModalDelete = (username) => {
+        setIsModalOpenDelete(true);
+        setUsuarioSeleccionado(username);
+
+        console.log("#########################", username)
+    };
+    
+    
+    const closeModalDelete = () => {
+        setIsModalOpenDelete(false)
+        setUsuarioSeleccionado({})
+    }
 
     {
-        /* Modal Delete ananidado */
+        /* Modal de eliminación anidado */
     }
-    const [isModalOpenNest, setIsModalOpenNest] = useState(false);
+    const [isModalOpenNest, setIsModalOpenNest] = useState(false)
 
-    const openModalNest = () => setIsModalOpenNest(true);
-    const closeModalNest = () => setIsModalOpenNest(false);
+    const openModalNest = () => setIsModalOpenNest(true)
+    
+    const closeModalNest = () => setIsModalOpenNest(false)
 
-    // Simula la obtencion de datos del backend
+    
+
+
+    const handleChange = async (e) => {
+        setForm ({
+            ...form,
+            [e.target.name]: e.target.value
+        })
+    }
+
+    const handleSubmitPost = async (e) => {
+        //Para crear un usuario se debe enviar:
+        // username, name, lastname, email, password y role
+        e.preventDefault()
+        try {
+            const url = `${import.meta.env.VITE_BACKEND_URL}users`
+            const options = {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                }
+            }
+            await axios.post(url, form, options)
+            setForm(baseFormState)
+            toast.success("Usuario creado exitosamente")
+            setIsModalOpen(false)
+            setTimeout(() => {
+                window.location.reload();
+              }, 1000);
+        } catch (error) {
+            toast.error("Error al crear un usuario")
+        }
+    }
+
+    const handleSubmitUpdate = async (e) => {
+        // Para actualizar un usuario, se PUEDE enviar:
+        // username, name, lastname, email, password
+        e.preventDefault()
+        try {
+            const url = `${import.meta.env.VITE_BACKEND_URL}users/${usuarioSeleccionado.username}`
+            const options = {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                }
+            }
+
+            const filteredForm = Object.fromEntries(
+                Object.entries(form).filter(([_, value]) => value.trim() !== "")
+            );
+
+            await axios.put(url, filteredForm, options)
+
+            closeModalEdit()
+            toast.success("Usuario actualizado exitosamente")
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } catch (error) {
+            toast.error("Error al actualizar un usuario")
+        }
+    }
+
+    const handleDelete = async (e) => {
+        //console.log("Usuariooooooooooo: ", usuarioSeleccionado)
+        try {
+            const url = `${import.meta.env.VITE_BACKEND_URL}users/${usuarioSeleccionado}`
+            const options = {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                }
+            }
+    
+            await axios.delete(url, options)
+            closeModalDelete()
+            closeModalNest()
+            toast.success("Usuario eliminado exitosamente")
+            
+            setTimeout(() => {
+                window.location.reload();
+              }, 1000);
+        } catch (error) {
+            toast.error("Error al eliminar el usuario")
+        }
+    };
+    
     useEffect(() => {
         const fetchUsers = async () => {
-            // Reemplazar con una llamada de la api
-            const mockData = [
-                { id: 1, name: "John Doe", email: "john@example.com", role: "Admin" },
-                { id: 2, name: "Jane Smith", email: "jane@example.com", role: "User" },
-                {
-                    id: 3,
-                    name: "Alice Johnson",
-                    email: "alice@example.com",
-                    role: "Editor",
-                },
-                { id: 4, name: "Bob Brown", email: "bob@example.com", role: "User" },
-                { id: 5, name: "Eve White", email: "eve@example.com", role: "Admin" },
-                {
-                    id: 6,
-                    name: "Charlie Black",
-                    email: "charlie@example.com",
-                    role: "Editor",
-                },
-                {
-                    id: 7,
-                    name: "David Green",
-                    email: "david@example.com",
-                    role: "User",
-                },
-                {
-                    id: 8,
-                    name: "Fiona Blue",
-                    email: "fiona@example.com",
-                    role: "Admin",
-                },
-                {
-                    id: 9,
-                    name: "Grace Yellow",
-                    email: "grace@example.com",
-                    role: "User",
-                },
-                {
-                    id: 10,
-                    name: "Hank Pink",
-                    email: "hank@example.com",
-                    role: "Editor",
-                },
-                { id: 11, name: "Ivy Orange", email: "ivy@example.com", role: "User" },
-            ];
-            setUsers(mockData);
+            try
+            {
+                const url = `${import.meta.env.VITE_BACKEND_URL}users`
+                const options = {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+                const respuesta = await axios.get(url, options)
+                console.log(respuesta)
+                setUsers(respuesta.data);
+            }
+            catch (error)
+            {
+
+            }
+            
         };
 
         fetchUsers();
@@ -103,12 +227,14 @@ const GestionUsuarios = () => {
     // logica de paginacion
     const indexOfLastRow = currentPage * rowsPerPage;
     const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-    const currentRows = users.slice(indexOfFirstRow, indexOfLastRow);
+    const currentRows = Array.isArray(users) ? users.slice(indexOfFirstRow, indexOfLastRow) : [];
+    console.log("CurrentRows: ", currentRows)
 
     const totalPages = Math.ceil(users.length / rowsPerPage);
 
     return (
         <div className="user-management-container">
+            <ToastContainer/>
             {/* Sidebar */}
             <div className="sidebar">
                 <div>
@@ -127,38 +253,42 @@ const GestionUsuarios = () => {
                             <tr>
                                 <th>ID</th>
                                 <th>Nombre y Apellido</th>
+                                <th>Username</th>
                                 <th>Correo</th>
                                 <th>Rol</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {/* Input Row */}
+                            {/* Fila de ingreso */}
                             <tr>
                                 <td></td>
                                 <td></td>
                                 <td>
                                     <button className="add-button" onClick={openModal}>
-                                        {" "}
-                                        <FaUserPlus />{" "}
+                                        <FaUserPlus />
                                     </button>
                                 </td>
                                 <td></td>
                                 <td></td>
                             </tr>
 
-                            {/* Filas de usuario */}
+                            {/* Listado de usuarios */}
                             {currentRows.map((user) => (
-                                <tr key={user.id}>
-                                    <td>{user.id}</td>
-                                    <td>{user.name}</td>
+                                <tr key={user._id}>
+                                    <td>{user._id}</td>
+                                    <td>{user.name} {user.lastname}</td>
+                                    <td>{user.username} </td>
                                     <td>{user.email}</td>
                                     <td>{user.role}</td>
                                     <td>
-                                        <button className="edit-button" onClick={openModalEdit}>
+                                        <button className="edit-button" onClick={() => {
+                                            //console.log("---------------------", user._id)
+                                            openModalEdit(user._id)
+                                            }}>
                                             <FaEdit />
                                         </button>
-                                        <button className="delete-button" onClick={openModalDelete}>
+                                        <button className="delete-button" onClick={() => openModalDelete(user.username)}>
                                             <FaTrash />
                                         </button>
                                     </td>
@@ -194,7 +324,17 @@ const GestionUsuarios = () => {
                     </button>
                 </div>
             </div>
-            {/* Modal add user */}
+
+
+
+
+
+
+
+
+
+
+            {/* Modal para agregar usuario */}
             {isModalOpen && (
                 <div className="modal-overlay">
                     <div className="modal-content">
@@ -202,51 +342,47 @@ const GestionUsuarios = () => {
                             &times;
                         </button>
                         <h2>Nuevo Usuario</h2>
-                        <form className="user-form">
+                        <form className="user-form" onSubmit={handleSubmitPost}>
                             <label>
                                 Nombre:
-                                <input type="text" placeholder="Nombre" required />
+                                <input type="text" placeholder="Nombre" required name="name" value={form.name || ""} onChange={handleChange} />
+                            </label>
+                            <label>
+                                Apellido:
+                                <input type="text" placeholder="Apellido" required name="lastname" value={form.lastname || ""} onChange={handleChange} />
                             </label>
                             <label>
                                 Usuario:
-                                <input type="text" placeholder="Usuario" required />
+                                <input type="text" placeholder="Usuario" required name="username" value={form.username || ""} onChange={handleChange} />
                             </label>
                             <label>
                                 Email:
-                                <input type="email" placeholder="Email" required />
+                                <input type="email" placeholder="Email" required name="email" value={form.email || ""} onChange={handleChange} />
                             </label>
                             <div className="password-container">
                                 <label>
                                     Contraseña:
-                                    <input type="password" placeholder="Contraseña" required />
-                                </label>
-                                <label>
-                                    Confirmar contraseña:
-                                    <input
-                                        type="password"
-                                        placeholder="Confirmar contraseña"
-                                        required
-                                    />
+                                    <input type="password" placeholder="Contraseña" required name="password" value={form.password || ""} onChange={handleChange} />
                                 </label>
                             </div>
                             <fieldset>
                                 <legend>Rol:</legend>
                                 <label>
-                                    <input type="radio" name="role" value="Admin" required />
-                                    Admin
+                                    <input type="radio" name="role" value="administrador" required onChange={handleChange} />
+                                    Administrador
                                 </label>
                                 <label>
-                                    <input type="radio" name="role" value="Coach" required />
-                                    Coach
+                                    <input type="radio" name="role" value="entrenador" required onChange={handleChange} />
+                                    Entrenador
                                 </label>
                                 <label>
-                                    <input type="radio" name="role" value="Cliente" required />
+                                    <input type="radio" name="role" value="cliente" required onChange={handleChange} />
                                     Cliente
                                 </label>
                             </fieldset>
                             <label>
                                 Foto de perfil:
-                                <input type="file" accept="image/*" />
+                                <input type="file" accept="image/*" name="imagen" onChange={handleChange} />
                             </label>
                             <button type="submit" className="submit-button">
                                 REGISTRAR
@@ -255,7 +391,13 @@ const GestionUsuarios = () => {
                     </div>
                 </div>
             )}
-            {/* Modal Edit user */}
+
+
+
+
+
+
+            {/* Modal para actualizar usuarios */}
             {isModalOpenEdit && (
                 <div className="modal-overlay">
                     <div className="modal-content">
@@ -263,38 +405,36 @@ const GestionUsuarios = () => {
                             &times;
                         </button>
                         <h2>Editar Usuario</h2>
-                        <form className="user-form">
+                        <form className="user-form" onSubmit={handleSubmitUpdate}>
                             <label>
                                 Nombre:
-                                <input type="text" placeholder="Nombre" required />
+                                <input type="text" placeholder="Nombre" required name="name" value={form.name} onChange={handleChange}  />
+                            </label>
+                            <label>
+                                Apellido:
+                                <input type="text" placeholder="Nombre" required name="lastname" value={form.lastname} onChange={handleChange} />
                             </label>
                             <label>
                                 Usuario:
-                                <input type="text" placeholder="Usuario" required />
+                                <input type="text" placeholder="Usuario" required name="username" value={form.username} onChange={handleChange} />
                             </label>
                             <label>
                                 Email:
-                                <input type="email" placeholder="Email" required />
+                                <input type="email" placeholder="Email" required name="email" value={form.email} onChange={handleChange} />
                             </label>
                             <div className="password-container">
                                 <label>
                                     Contraseña:
-                                    <input type="password" placeholder="Contraseña" required />
+                                    <input type="password" placeholder="Contraseña" name="password" value={form.password} onChange={handleChange} />
                                 </label>
-                                <label>
-                                    Confirmar contraseña:
-                                    <input
-                                        type="password"
-                                        placeholder="Confirmar contraseña"
-                                        required
-                                    />
-                                </label>
-                            </div>
 
+                            </div>
+                            {/*
                             <label>
                                 Foto de perfil:
                                 <input type="file" accept="image/*" />
                             </label>
+                            */}
                             <button type="submit" className="submit-button">
                                 ACTUALIZAR
                             </button>
@@ -303,7 +443,14 @@ const GestionUsuarios = () => {
                 </div>
             )}
 
-            {/* Modal Delete User */}
+
+
+
+
+
+
+
+            {/* Modal para eliminar usuarios */}
             {isModalOpenDelete && (
                 <div className="modal-overlay">
                     <div className="modal-content">
@@ -328,7 +475,12 @@ const GestionUsuarios = () => {
                 </div>
             )}
 
-            {/* Modal Delete User Nest */}
+
+
+
+
+
+            {/* Modal de eliminación de usuario anidado */}
             {isModalOpenNest && (
                 <div className="modal-overlay">
                     <div className="modal-content">
@@ -336,17 +488,11 @@ const GestionUsuarios = () => {
                             <h2>ELIMINADO</h2>
                             <FaTrash className="icon-trash" />
                         </div>
-                        <form className="user-form">
-                            <button
-                                className="submit-button"
-                                onClick={() => {
-                                    closeModalDelete;
-                                    closeModalNest;
-                                }}
-                            >
-                                CONTINUAR
-                            </button>
-                        </form>
+                        <button
+                            className="submit-button"
+                            onClick={handleDelete}>
+                            CONTINUAR
+                        </button>
                     </div>
                 </div>
             )}

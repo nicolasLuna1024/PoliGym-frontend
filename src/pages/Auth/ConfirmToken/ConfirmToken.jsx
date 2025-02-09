@@ -21,7 +21,6 @@ function ConfirmToken() {
 
     const sendMail = async (data) => {
         const url = `${import.meta.env.VITE_BACKEND_URL}auth/recovery-password`
-        console.log(data)
         await axios.post(url, data)
         setTimeout(() => {
             navigate('/auth/login')

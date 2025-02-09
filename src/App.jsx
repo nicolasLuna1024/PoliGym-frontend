@@ -52,9 +52,9 @@ const router = createBrowserRouter([
     //Ruteo de la página admin
     {
         path: "/admin/*",
-        element: <AdminLayout></AdminLayout>,
+        element: <AdminLayout/>,
         children: [
-            { path: "", element: <GestionUsuarios></GestionUsuarios> },
+            { path: "", element: <AuthProvider> <GestionUsuarios/> </AuthProvider> },
             { path: "add", element: <Admin_newClient></Admin_newClient> }/*,
       {
         path: "/admin/delete"

@@ -1,535 +1,492 @@
-import React, { useContext, useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios"
 import AuthContext from "../../../contexts/AuthProvider";
 import { toast, ToastContainer } from "react-toastify";
-
-//Borrar el import de Navbar
-// import Navbar from "../../../components/navegacion/navbar";
-// import "../ClienteEntrenamientos/ClienteEntrenamientos.css";
+import { toast } from "react-toastify"; // Notificaciones
 
 
-// const ClienteEntrenamientos = () => {
-
-//     const {auth, token} = useContext(AuthContext)
-
-//     console.log(auth)
-//     console.log(token)
-
-//     const handleSubmitTest = async () => {
-//         const url = `${import.meta.env.VITE_BACKEND_URL}asistencias`;
-
-//         try {            
-//             const response = await axios.get(url, {
-//                 withCredentials: true, // Enviar cookies automáticamente
-//                 headers: {
-//                     "Authorization": `Bearer ${token}`
-//                 }
-//             });
-
-//             console.log("Respuesta recibida:", response);
-//             toast.success("Solicitud hecha con éxito")
-//         } catch (error) {
-//             console.error("Error en la solicitud:", error);
-//         }
-//     };
-
-// /*
-//     const handleSubmitTest = async (e) => {
-//         e.preventDefault();
-//         try {
-//             const url = `${import.meta.env.VITE_BACKEND_URL}asistencias`
-
-//             const options = {
-//                 headers: {
-//                     'Content-Type': 'application/json',
-
-//                     Authorization: `Bearer ${token}`
-//                 },
-//                 withCredentials: true
-//             }
-
-//             //const respuesta = await axios.get(url, options, {withCredentials: true}) OJO - Meritorio de análisis recordatorio ----------------------------------------------------------------------------------------------------
-//             const respuesta = await axios.get(url, options)
-//             console.log(respuesta)
-//             toast.success("Solicitud hecha con éxito")
-//         } catch (error) {
-//             toast.error("Error al realizar la solicitud")
-//         }
-//     }
-//         */
-
-//     return (
-//         <div>
-//             <ToastContainer/>
-//             <form onSubmit={handleSubmitTest}>
-//                 <button type="submit">Testear</button>
-//             </form>
-//             <div className="relative overflow-hidden shadow-md rounded-lg w-1/2 mx-auto">
-//                 <table className="table-fixed w-full text-left">
-//                     <thead className="uppercase bg-gray-600 text-gray-200">
-//                         <tr>
-//                             <td className="py-3 border text-center p-4" >Nombre</td>
-//                             <td className="py-2 border text-center p-4" >Descripción</td>
-//                             <td className="py-2 border text-center p-4" >Series</td>
-//                             <td className="py-2 border text-center p-4" >Repeticiones</td>
-//                             <td className="py-2 border text-center p-2 w-16 text-xs" >Edit</td>
-//                             <td className="py-2 border text-center p-2 w-16 text-xs" >Delete</td>
-//                         </tr>
-//                     </thead>
-//                     <tbody className="bg-white text-gray-500">
-//                         <tr>
-//                             <td className="py-5 border text-center p-4" >YY-853581</td>
-//                             <td className="py-5 border text-center p-4" >Notebook Basic</td>
-//                             <td className="py-5 border text-center p-4" >$ 299</td>
-//                             <td className="py-5 border text-center p-4" >YY-853599</td>
-//                             <td className="py-5 border text-center p-2 w-16" ><button className="bg-white text-black border border-gray-300 rounded px-2 py-1" >🖊️</button></td>
-//                             <td className="py-5 border text-center p-2 w-16" ><button className="bg-white text-black border border-gray-300 rounded px-2 py-1">🗑️</button></td>
-
-//                         </tr>
-//                         {[...Array(5)].map((_, index) => (
-//                             <tr key={index}>
-//                                 <td className="py-5 border text-center p-4" ></td>
-//                                 <td className="py-5 border text-center p-4" ></td>
-//                                 <td className="py-5 border text-center p-4" ></td>
-//                                 <td className="py-5 border text-center p-4" ></td>
-//                                 <td className="py-5 border text-center p-2 w-16" ><button className="bg-white text-black border border-gray-300 rounded px-2 py-1" >🖊️</button></td>
-//                                 <td className="py-5 border text-center p-2 w-16" ><button className="bg-white text-black border border-gray-300 rounded px-2 py-1">🗑️</button></td>
-
-//                             </tr>
-//                         ))}
-//                     </tbody>
-//                 </table>
-//             </div>
-//         </div>
-//     );
-// };
 
 
 
 const ClienteEntrenamientos = () => {
-    const [dateStart, setDateStart] = useState('');
-    const [dateEnd, setDateEnd] = useState('');
-    const [details, setDetails] = useState([{ name: '', measure: '' }]);
-    const [entries, setEntries] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [viewModalData, setViewModalData] = useState(null);
-    const [editIndex, setEditIndex] = useState(null);
+  const [routines, setRoutines] = useState([]);
+  const [routineName, setRoutineName] = useState('');
+  const [routineDescription, setRoutineDescription] = useState('');
+  const [exercises, setExercises] = useState([]);
+  const [exerciseName, setExerciseName] = useState('');
+  const [series, setSeries] = useState('');
+  const [repetitions, setRepetitions] = useState('');
+  const [showPopup, setShowPopup] = useState(false);
+  const [showExercisePopup, setShowExercisePopup] = useState(false);
+  const [showViewPopup, setShowViewPopup] = useState(false);
+  const [showEditPopup, setShowEditPopup] = useState(false);
+  const [selectedRoutineIndex, setSelectedRoutineIndex] = useState(null);
+  const [editingExerciseIndex, setEditingExerciseIndex] = useState(null);
 
-    // Manejar cambios en los campos del formulario
-    const handleDetailsChange = (index, field, value) => {
-        const updatedDetails = [...details];
-        updatedDetails[index][field] = value;
-        setDetails(updatedDetails);
+  // Agregar rutina
+  const handleAddRoutine = () => {
+    const newRoutine = {
+      Nombre: routineName,
+      Descripcion: routineDescription,
+      exercises: exercises,
     };
+    setRoutines([...routines, newRoutine]);
+    resetForm();
+    setShowPopup(false);
+  };
 
-    // Agregar un nuevo campo de detalle
-    const addDetailField = () => {
-        setDetails([...details, { name: '', measure: '' }]);
+  // Agregar ejercicio
+  const handleAddExercise = () => {
+    const newExercise = {
+      name: exerciseName,
+      series: parseInt(series),
+      repetitions: parseInt(repetitions),
     };
+    if (editingExerciseIndex !== null) {
+      // Editar ejercicio existente
+      const updatedExercises = [...exercises];
+      updatedExercises[editingExerciseIndex] = newExercise;
+      setExercises(updatedExercises);
+      setEditingExerciseIndex(null); // Resetear modo edición
+    } else {
+      // Agregar nuevo ejercicio
+      setExercises([...exercises, newExercise]);
+    }
+    resetExerciseForm();
+    setShowExercisePopup(false);
+  };
 
-    // Eliminar un campo de detalle
-    const removeDetailField = (index) => {
-        const updatedDetails = details.filter((_, i) => i !== index);
-        setDetails(updatedDetails);
+  // Eliminar rutina
+  const handleDeleteRoutine = (index) => {
+    const updatedRoutines = routines.filter((_, i) => i !== index);
+    setRoutines(updatedRoutines);
+  };
+
+  // Ver rutina
+  const handleViewRoutine = (index) => {
+    setSelectedRoutineIndex(index);
+    setShowViewPopup(true);
+  };
+
+  // Editar rutina
+  const handleEditRoutine = (index) => {
+    const routineToEdit = routines[index];
+    setSelectedRoutineIndex(index);
+    setRoutineName(routineToEdit.Nombre);
+    setRoutineDescription(routineToEdit.Descripcion);
+    setExercises(routineToEdit.exercises); // Cargar los ejercicios existentes
+    setShowEditPopup(true);
+  };
+
+  // Guardar edición
+  const handleSaveEdit = () => {
+    const updatedRoutine = {
+      Nombre: routineName,
+      Descripcion: routineDescription,
+      exercises: exercises,
     };
+    const updatedRoutines = [...routines];
+    updatedRoutines[selectedRoutineIndex] = updatedRoutine;
+    setRoutines(updatedRoutines);
+    resetForm();
+    setShowEditPopup(false);
+  };
 
-    // Guardar los datos ingresados
-    const handleSubmit = (e) => {
-        e.preventDefault();
+  // Eliminar ejercicio
+  const handleDeleteExercise = (index) => {
+    const updatedExercises = exercises.filter((_, i) => i !== index);
+    setExercises(updatedExercises);
+  };
 
-        const newEntry = {
-            dateStart,
-            dateEnd,
-            details,
-        };
+  // Editar ejercicio
+  const handleEditExercise = (index) => {
+    const exerciseToEdit = exercises[index];
+    setExerciseName(exerciseToEdit.name);
+    setSeries(exerciseToEdit.series.toString());
+    setRepetitions(exerciseToEdit.repetitions.toString());
+    setEditingExerciseIndex(index); // Activar modo edición
+    setShowExercisePopup(true);
+  };
 
-        if (editIndex !== null) {
-            // Editar entrada existente
-            const updatedEntries = [...entries];
-            updatedEntries[editIndex] = newEntry;
-            setEntries(updatedEntries);
-            setEditIndex(null);
-        } else {
-            // Agregar nueva entrada
-            setEntries([...entries, newEntry]);
-        }
+  // Resetear formulario
+  const resetForm = () => {
+    setRoutineName('');
+    setRoutineDescription('');
+    setExercises([]);
+  };
 
-        // Limpiar campos
-        setDateStart('');
-        setDateEnd('');
-        setDetails([{ name: '', measure: '' }]);
-        setIsModalOpen(false);
-    };
+  // Resetear formulario de ejercicios
+  const resetExerciseForm = () => {
+    setExerciseName('');
+    setSeries('');
+    setRepetitions('');
+    setEditingExerciseIndex(null); // Resetear modo edición
+  };
 
-    // Abrir modal para editar una entrada
-    const handleEdit = (index) => {
-        const entryToEdit = entries[index];
-        setDateStart(entryToEdit.dateStart);
-        setDateEnd(entryToEdit.dateEnd);
-        setDetails(entryToEdit.details);
-        setEditIndex(index);
-        setIsModalOpen(true);
-    };
+  return (
+    <div style={containerStyle}>
+      <h1 style={titleStyle}>Gestión de Rutinas</h1>
 
-    // Eliminar una entrada
-    const handleDelete = (index) => {
-        const updatedEntries = entries.filter((_, i) => i !== index);
-        setEntries(updatedEntries);
-    };
+      {/* Botón para abrir el popup de agregar rutina */}
+      <button style={addButtonStyle} onClick={() => setShowPopup(true)}>
+        Agregar Rutinas
+      </button>
 
-    return (
-        <div style={styles.container}>
-            <h2 style={styles.title}>Registro de Progreso</h2>
+      {/* Tabla de rutinas */}
+      <table style={tableStyle}>
+        <thead>
+          <tr>
+            <th style={tableHeaderStyle}>Nombre</th>
+            <th style={tableHeaderStyle}>Descripción</th>
+            <th style={tableHeaderStyle}>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {routines.map((routine, index) => (
+            <tr key={index} style={tableRowStyle}>
+              <td style={tableCellStyle}>{routine.Nombre}</td>
+              <td style={tableCellStyle}>{routine.Descripcion}</td>
+              <td style={tableCellStyle}>
+                <div style={actionButtonsContainerStyle}>
+                  <button
+                    style={viewButtonStyle}
+                    onClick={() => handleViewRoutine(index)}
+                  >
+                    Ver
+                  </button>
+                  <button
+                    style={editButtonStyle}
+                    onClick={() => handleEditRoutine(index)}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    style={deleteButtonStyle}
+                    onClick={() => handleDeleteRoutine(index)}
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-            {/* Botón para abrir el modal */}
-            <button onClick={() => setIsModalOpen(true)} style={styles.addButton}>
-                Agregar Entrada
+      {/* Popup para agregar rutina */}
+      {showPopup && (
+        <div style={popupStyle}>
+          <div style={popupContentStyle}>
+            <h2 style={popupTitleStyle}>Agregar Rutina</h2>
+            <input
+              type="text"
+              placeholder="Nombre"
+              value={routineName}
+              onChange={(e) => setRoutineName(e.target.value)}
+              style={inputStyle}
+            />
+            <input
+              type="text"
+              placeholder="Descripción"
+              value={routineDescription}
+              onChange={(e) => setRoutineDescription(e.target.value)}
+              style={inputStyle}
+            />
+            <button style={secondaryButtonStyle} onClick={() => setShowExercisePopup(true)}>
+              Agregar Ejercicio
             </button>
-
-            {/* Modal para agregar/editar entradas */}
-            {isModalOpen && (
-                <div style={styles.modalOverlay}>
-                    <div style={styles.modalContentScrollable}>
-                        <h3 style={styles.modalTitle}>{editIndex !== null ? 'Editar Entrada' : 'Agregar Entrada'}</h3>
-                        <form onSubmit={handleSubmit} style={styles.form}>
-                            <div style={styles.formGroup}>
-                                <label style={styles.label}>Fecha Inicio:</label>
-                                <input
-                                    type="date"
-                                    value={dateStart}
-                                    onChange={(e) => setDateStart(e.target.value)}
-                                    required
-                                    style={styles.input}
-                                />
-                            </div>
-
-                            <div style={styles.formGroup}>
-                                <label style={styles.label}>Fecha Fin:</label>
-                                <input
-                                    type="date"
-                                    value={dateEnd}
-                                    onChange={(e) => setDateEnd(e.target.value)}
-                                    required
-                                    style={styles.input}
-                                />
-                            </div>
-
-                            {/* Detalles dinámicos */}
-                            <div style={styles.detailsContainer}>
-                                {details.map((detail, index) => (
-                                    <div key={index} style={styles.detailGroup}>
-                                        <div style={styles.formGroup}>
-                                            <label style={styles.label}>Nombre:</label>
-                                            <input
-                                                type="text"
-                                                value={detail.name}
-                                                onChange={(e) => handleDetailsChange(index, 'name', e.target.value)}
-                                                required
-                                                style={styles.input}
-                                            />
-                                        </div>
-
-                                        <div style={styles.formGroup}>
-                                            <label style={styles.label}>Medida:</label>
-                                            <input
-                                                type="number"
-                                                step="0.1"
-                                                value={detail.measure}
-                                                onChange={(e) => handleDetailsChange(index, 'measure', e.target.value)}
-                                                required
-                                                style={styles.input}
-                                            />
-                                        </div>
-
-                                        <button
-                                            type="button"
-                                            onClick={() => removeDetailField(index)}
-                                            style={styles.deleteButton}
-                                        >
-                                            Eliminar
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <button type="button" onClick={addDetailField} style={styles.addButton}>
-                                Agregar Detalle
-                            </button>
-
-                            <div style={styles.modalActions}>
-                                <button type="submit" style={styles.button}>
-                                    {editIndex !== null ? 'Actualizar' : 'Agregar'}
-                                </button>
-                                <button onClick={() => setIsModalOpen(false)} style={styles.cancelButton}>
-                                    Cancelar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-
-            {/* Tabla para mostrar las entradas */}
-            <table style={styles.table}>
-                <thead>
-                    <tr style={styles.tableHeaderRow}>
-                        <th style={styles.tableHeader}>#</th>
-                        <th style={styles.tableHeader}>Fecha Inicio</th>
-                        <th style={styles.tableHeader}>Fecha Fin</th>
-                        <th style={styles.tableHeader}>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {entries.map((entry, index) => (
-                        <tr key={index} style={styles.tableRow}>
-                            <td style={styles.tableCell}>{index + 1}</td>
-                            <td style={styles.tableCell}>{entry.dateStart}</td>
-                            <td style={styles.tableCell}>{entry.dateEnd}</td>
-                            <td style={styles.tableCell}>
-                                <div style={styles.actionsContainer}>
-                                    <button
-                                        onClick={() => setViewModalData(entry.details)}
-                                        style={styles.viewButton}
-                                    >
-                                        Ver
-                                    </button>
-                                    <button onClick={() => handleEdit(index)} style={styles.editButton}>
-                                        Editar
-                                    </button>
-                                    <button onClick={() => handleDelete(index)} style={styles.deleteButton}>
-                                        Eliminar
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-
-            {/* Modal para ver detalles */}
-            {viewModalData && (
-                <div style={styles.modalOverlay}>
-                    <div style={styles.modalContent}>
-                        <h3 style={styles.modalTitle}>Detalles</h3>
-                        <table style={styles.detailTable}>
-                            <thead>
-                                <tr>
-                                    <th style={styles.detailTableHeader}>Nombre</th>
-                                    <th style={styles.detailTableHeader}>Medida</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {viewModalData.map((detail, index) => (
-                                    <tr key={index}>
-                                        <td style={styles.detailTableCell}>{detail.name}</td>
-                                        <td style={styles.detailTableCell}>{detail.measure}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        <button onClick={() => setViewModalData(null)} style={styles.cancelButton}>
-                            Cerrar
-                        </button>
-                    </div>
-                </div>
-            )}
+            <div>
+              <h3 style={popupSubtitleStyle}>Ejercicios Agregados:</h3>
+              <ul style={exerciseListStyle}>
+                {exercises.map((exercise, index) => (
+                  <li key={index} style={exerciseItemStyle}>
+                    {exercise.name} - Series: {exercise.series}, Repeticiones: {exercise.repetitions}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <button style={primaryButtonStyle} onClick={handleAddRoutine}>
+              Guardar Rutina
+            </button>
+            <button style={secondaryButtonStyle} onClick={() => setShowPopup(false)}>
+              Cancelar
+            </button>
+          </div>
         </div>
-    );
+      )}
+
+      {/* Popup para agregar/editar ejercicio */}
+      {showExercisePopup && (
+        <div style={{ ...popupStyle, zIndex: 1001 }}> {/* Mayor z-index */}
+          <div style={popupContentStyle}>
+            <h2 style={popupTitleStyle}>
+              {editingExerciseIndex !== null ? 'Editar Ejercicio' : 'Agregar Ejercicio'}
+            </h2>
+            <input
+              type="text"
+              placeholder="Nombre del Ejercicio"
+              value={exerciseName}
+              onChange={(e) => setExerciseName(e.target.value)}
+              style={inputStyle}
+            />
+            <input
+              type="number"
+              placeholder="Series"
+              value={series}
+              onChange={(e) => setSeries(e.target.value)}
+              style={inputStyle}
+            />
+            <input
+              type="number"
+              placeholder="Repeticiones"
+              value={repetitions}
+              onChange={(e) => setRepetitions(e.target.value)}
+              style={inputStyle}
+            />
+            <button style={primaryButtonStyle} onClick={handleAddExercise}>
+              {editingExerciseIndex !== null ? 'Guardar Cambios' : 'Agregar Ejercicio'}
+            </button>
+            <button style={secondaryButtonStyle} onClick={() => setShowExercisePopup(false)}>
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Popup para ver rutina */}
+      {showViewPopup && selectedRoutineIndex !== null && (
+        <div style={popupStyle}>
+          <div style={popupContentStyle}>
+            <h2 style={popupTitleStyle}>Detalles de la Rutina</h2>
+            <p><strong>Nombre:</strong> {routines[selectedRoutineIndex].Nombre}</p>
+            <p><strong>Descripción:</strong> {routines[selectedRoutineIndex].Descripcion}</p>
+            <h3>Ejercicios:</h3>
+            <ul style={exerciseListStyle}>
+              {routines[selectedRoutineIndex].exercises.map((exercise, index) => (
+                <li key={index} style={exerciseItemStyle}>
+                  {exercise.name} - Series: {exercise.series}, Repeticiones: {exercise.repetitions}
+                </li>
+              ))}
+            </ul>
+            <button style={secondaryButtonStyle} onClick={() => setShowViewPopup(false)}>
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Popup para editar rutina */}
+      {showEditPopup && selectedRoutineIndex !== null && (
+        <div style={{ ...popupStyle, zIndex: 1000 }}> {/* Menor z-index */}
+          <div style={popupContentStyle}>
+            <h2 style={popupTitleStyle}>Editar Rutina</h2>
+            <input
+              type="text"
+              placeholder="Nombre"
+              value={routineName}
+              onChange={(e) => setRoutineName(e.target.value)}
+              style={inputStyle}
+            />
+            <input
+              type="text"
+              placeholder="Descripción"
+              value={routineDescription}
+              onChange={(e) => setRoutineDescription(e.target.value)}
+              style={inputStyle}
+            />
+            <button style={secondaryButtonStyle} onClick={() => setShowExercisePopup(true)}>
+              Agregar Ejercicio
+            </button>
+            <div>
+              <h3 style={popupSubtitleStyle}>Ejercicios Agregados:</h3>
+              <ul style={exerciseListStyle}>
+                {exercises.map((exercise, index) => (
+                  <li key={index} style={exerciseItemStyle}>
+                    {exercise.name} - Series: {exercise.series}, Repeticiones: {exercise.repetitions}
+                    <div style={actionButtonsContainerStyle}>
+                      <button
+                        style={editButtonStyle}
+                        onClick={() => handleEditExercise(index)}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        style={deleteButtonStyle}
+                        onClick={() => handleDeleteExercise(index)}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <button style={primaryButtonStyle} onClick={handleSaveEdit}>
+              Guardar Cambios
+            </button>
+            <button style={secondaryButtonStyle} onClick={() => setShowEditPopup(false)}>
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
-// Estilos mejorados para diseño simple y elegante
-const styles = {
-    container: {
-        maxWidth: '800px',
-        margin: '0 auto',
-        padding: '20px',
-        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        backgroundColor: '#f9f9f9',
-        borderRadius: '10px',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    },
-    title: {
-        textAlign: 'center',
-        color: '#333',
-        marginBottom: '20px',
-        fontSize: '24px',
-        fontWeight: 'bold',
-    },
-    addButton: {
-        display: 'block',
-        width: '100%',
-        padding: '10px',
-        backgroundColor: '#28a745',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '5px',
-        cursor: 'pointer',
-        transition: 'background-color 0.3s ease',
-        marginBottom: '20px',
-    },
-    modalOverlay: {
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 1000,
-    },
-    modalContentScrollable: {
-        backgroundColor: '#fff',
-        padding: '20px',
-        borderRadius: '10px',
-        width: '100%',
-        maxWidth: '500px',
-        maxHeight: '80vh',
-        overflowY: 'auto',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    },
-    modalContent: {
-        backgroundColor: '#fff',
-        padding: '20px',
-        borderRadius: '10px',
-        width: '100%',
-        maxWidth: '500px',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    },
-    modalTitle: {
-        textAlign: 'center',
-        color: '#333',
-        marginBottom: '20px',
-        fontSize: '20px',
-        fontWeight: 'bold',
-    },
-    form: {
-        marginBottom: '20px',
-    },
-    formGroup: {
-        marginBottom: '15px',
-    },
-    label: {
-        display: 'block',
-        marginBottom: '5px',
-        color: '#555',
-        fontWeight: 'bold',
-    },
-    input: {
-        width: '100%',
-        padding: '10px',
-        boxSizing: 'border-box',
-        border: '1px solid #ccc',
-        borderRadius: '5px',
-        transition: 'border-color 0.3s ease',
-    },
-    detailsContainer: {
-        maxHeight: '300px',
-        overflowY: 'auto',
-        marginBottom: '15px',
-        border: '1px solid #ddd',
-        borderRadius: '5px',
-        padding: '10px',
-    },
-    detailGroup: {
-        marginBottom: '15px',
-    },
-    modalActions: {
-        display: 'flex',
-        justifyContent: 'space-between',
-    },
-    button: {
-        padding: '10px 20px',
-        backgroundColor: '#007bff',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '5px',
-        cursor: 'pointer',
-        transition: 'background-color 0.3s ease',
-    },
-    cancelButton: {
-        padding: '10px 20px',
-        backgroundColor: '#dc3545',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '5px',
-        cursor: 'pointer',
-        transition: 'background-color 0.3s ease',
-    },
-    table: {
-        width: '100%',
-        borderCollapse: 'collapse',
-        marginTop: '20px',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-    },
-    tableHeaderRow: {
-        backgroundColor: '#007bff',
-        color: '#fff',
-        textTransform: 'uppercase',
-        letterSpacing: '1px',
-    },
-    tableHeader: {
-        padding: '12px',
-        textAlign: 'left',
-        borderBottom: '2px solid #ddd',
-    },
-    tableRow: {
-        borderBottom: '1px solid #ddd',
-        transition: 'background-color 0.3s ease',
-    },
-    tableCell: {
-        padding: '12px',
-        verticalAlign: 'middle',
-    },
-    actionsContainer: {
-        display: 'flex',
-        gap: '10px', // Espacio entre los botones
-    },
-    viewButton: {
-        padding: '5px 10px',
-        backgroundColor: '#007bff',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '5px',
-        cursor: 'pointer',
-        transition: 'background-color 0.3s ease',
-    },
-    editButton: {
-        padding: '5px 10px',
-        backgroundColor: '#ffc107',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '5px',
-        cursor: 'pointer',
-        transition: 'background-color 0.3s ease',
-    },
-    deleteButton: {
-        padding: '5px 10px',
-        backgroundColor: '#dc3545',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '5px',
-        cursor: 'pointer',
-        transition: 'background-color 0.3s ease',
-    },
-    detailTable: {
-        width: '100%',
-        borderCollapse: 'collapse',
-        marginTop: '10px',
-    },
-    detailTableHeader: {
-        padding: '8px',
-        backgroundColor: '#007bff',
-        color: '#fff',
-        textAlign: 'left',
-    },
-    detailTableCell: {
-        padding: '8px',
-        borderBottom: '1px solid #ddd',
-    },
+// Estilos generales
+const containerStyle = {
+  fontFamily: 'Arial, sans-serif',
+  maxWidth: '800px',
+  margin: '0 auto',
+  padding: '20px',
+  backgroundColor: '#f9f9f9',
+  borderRadius: '8px',
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
 };
 
+const titleStyle = {
+  textAlign: 'center',
+  color: '#333',
+  marginBottom: '20px',
+};
 
+const addButtonStyle = {
+  display: 'block',
+  width: '100%',
+  padding: '10px',
+  backgroundColor: '#4CAF50',
+  color: 'white',
+  border: 'none',
+  borderRadius: '4px',
+  cursor: 'pointer',
+  fontSize: '16px',
+  marginBottom: '20px',
+};
 
-export default ClienteEntrenamientos;
+const tableStyle = {
+  width: '100%',
+  borderCollapse: 'collapse',
+  marginTop: '20px',
+};
+
+const tableHeaderStyle = {
+  backgroundColor: '#4CAF50',
+  color: 'white',
+  padding: '10px',
+  textAlign: 'left',
+};
+
+const tableRowStyle = {
+  borderBottom: '1px solid #ddd',
+};
+
+const tableCellStyle = {
+  padding: '10px',
+};
+
+const actionButtonsContainerStyle = {
+  display: 'flex',
+  gap: '5px',
+};
+
+const viewButtonStyle = {
+  padding: '5px 10px',
+  backgroundColor: '#007BFF',
+  color: 'white',
+  border: 'none',
+  borderRadius: '4px',
+  cursor: 'pointer',
+};
+
+const editButtonStyle = {
+  padding: '5px 10px',
+  backgroundColor: '#FFC107',
+  color: 'white',
+  border: 'none',
+  borderRadius: '4px',
+  cursor: 'pointer',
+};
+
+const deleteButtonStyle = {
+  padding: '5px 10px',
+  backgroundColor: '#FF4D4D',
+  color: 'white',
+  border: 'none',
+  borderRadius: '4px',
+  cursor: 'pointer',
+};
+
+const popupStyle = {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  zIndex: 1000,
+};
+
+const popupContentStyle = {
+  backgroundColor: 'white',
+  padding: '20px',
+  borderRadius: '8px',
+  width: '400px',
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+};
+
+const popupTitleStyle = {
+  textAlign: 'center',
+  color: '#333',
+  marginBottom: '20px',
+};
+
+const popupSubtitleStyle = {
+  color: '#555',
+  marginBottom: '10px',
+};
+
+const inputStyle = {
+  width: '100%',
+  padding: '10px',
+  marginBottom: '10px',
+  border: '1px solid #ccc',
+  borderRadius: '4px',
+};
+
+const primaryButtonStyle = {
+  padding: '10px',
+  backgroundColor: '#4CAF50',
+  color: 'white',
+  border: 'none',
+  borderRadius: '4px',
+  cursor: 'pointer',
+  width: '100%',
+  marginBottom: '10px',
+};
+
+const secondaryButtonStyle = {
+  padding: '10px',
+  backgroundColor: '#007BFF',
+  color: 'white',
+  border: 'none',
+  borderRadius: '4px',
+  cursor: 'pointer',
+  width: '100%',
+};
+
+const exerciseListStyle = {
+  listStyleType: 'none',
+  padding: 0,
+};
+
+const exerciseItemStyle = {
+  padding: '5px 0',
+  borderBottom: '1px solid #ddd',
+};
+
+export default CLi;

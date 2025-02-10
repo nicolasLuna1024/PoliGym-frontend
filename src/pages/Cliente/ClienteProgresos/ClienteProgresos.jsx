@@ -25,7 +25,7 @@ const ClienteProgresos = () => {
     // Obtener los datos de progreso del backend
     useEffect(() => {
         const fetchProgresos = async () => {
-            const url = `${import.meta.env.VITE_BACKEND_URL}progresos/${username}`;
+            const url = `${import.meta.env.VITE_BACKEND_URL}progresos/${username}`; // Usamos el username del contexto
             const options = {
                 headers: {
                     'Content-Type': 'application/json',
@@ -34,6 +34,7 @@ const ClienteProgresos = () => {
             };
             try {
                 const respuesta = await axios.get(url, options);
+                console.log("Respuesta del Backend:", respuesta.data);
                 setProgresos(respuesta.data);
             } catch (error) {
                 console.error("Error al obtener los progresos", error);
@@ -120,11 +121,11 @@ const ClienteProgresos = () => {
                 updatedProgresos[editIndex] = respuesta.data;
                 setProgresos(updatedProgresos);
                 setEditIndex(null);
-                showNotification('success', "Entrada actualizada correctamente.");
+                showNotification('success', "Progreso actualizado correctamente.");
             } else {
                 // Agregar nueva entrada
                 setProgresos([...progresos, respuesta.data]);
-                showNotification('success', "Entrada agregada correctamente.");
+                showNotification('success', "Progreso agregado correctamente.");
             }
 
             // Limpiar campos
@@ -167,10 +168,10 @@ const ClienteProgresos = () => {
             await axios.delete(url, options);
             const updatedProgresos = progresos.filter((_, i) => i !== index);
             setProgresos(updatedProgresos);
-            showNotification('success', "Entrada eliminada correctamente.");
+            showNotification('success', "Progreso eliminado correctamente.");
         } catch (error) {
-            console.error("Error al eliminar la entrada", error);
-            showNotification('error', "No se pudo eliminar la entrada.");
+            console.error("Error al eliminar el progreso", error);
+            showNotification('error', "No se pudo eliminar el progreso.");
         }
     };
 
@@ -240,7 +241,7 @@ const ClienteProgresos = () => {
 
             {/* Botón para abrir el modal */}
             <button onClick={() => setIsModalOpen(true)} style={styles.addButton}>
-                Agregar Entrada
+                Agregar Progreso
             </button>
 
             {/* Modal para agregar/editar entradas */}

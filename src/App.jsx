@@ -77,13 +77,13 @@ const router = createBrowserRouter([
             </AuthProvider>,
         children: [
             {
-                path: "progresos/:username",
+                path: "progresos/:username", //Actualizacion a /progresos:username
                 element: <AuthProvider> 
                     <ClienteProgresos></ClienteProgresos>
                 </AuthProvider>
             },
             {
-                path: "entrenamientos",
+                path: "entrenamientos/:username",
                 element: <ClienteEntrenamientos></ClienteEntrenamientos>
             }
 

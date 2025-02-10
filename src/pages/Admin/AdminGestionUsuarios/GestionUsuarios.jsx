@@ -41,7 +41,7 @@ const GestionUsuarios = () => {
     
     //Paginación
     const [currentPage, setCurrentPage] = useState(1)
-    const rowsPerPage = 10
+    const rowsPerPage = 6
 
     {
         /* Modal de agregación */
@@ -63,7 +63,7 @@ const GestionUsuarios = () => {
 
         console.log("###############################", usuario)
         
-        if (!usuario) return; // Evita errores si el usuario no se encuentra
+        if (!usuario) return;
     
         setUsuarioSeleccionado(usuario);
         
@@ -72,8 +72,8 @@ const GestionUsuarios = () => {
             lastname: usuario.lastname || "",
             username: usuario.username || "",
             email: usuario.email || "",
-            password: "", // No se autocompleta por seguridad
-            confirmPassword: "" // No se autocompleta por seguridad
+            password: "",
+            confirmPassword: ""
         });
     };
     
@@ -237,7 +237,7 @@ const GestionUsuarios = () => {
             <ToastContainer/>
             {/* Sidebar */}
             <div className="sidebar">
-                <div>
+                <div className="sidebar-text">
                     <h1>Gestión de Usuarios</h1>
                 </div>
                 <button className="logout-button">Cerrar Sesión</button>
@@ -245,7 +245,7 @@ const GestionUsuarios = () => {
 
             {/* Main Content */}
             <div className="main-content">
-                <h3>Administrador:</h3>
+                <h3>Administrador: {} </h3>
 
                 <div className="table-container">
                     <table className="user-table">

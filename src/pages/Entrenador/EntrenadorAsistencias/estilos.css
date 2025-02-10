@@ -1,133 +1,346 @@
-/* ---------------------- Lado izquierdo ---------------------- */
-.container {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
+/* General Layout */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
 }
 
+.user-management-container {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: 1fr;
+}
 
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
 .sidebar {
     display: flex;
 
     flex-direction: column;
     grid-column: span 2;
-    
+
     border-right: 1px solid rgb(203, 203, 203);
 
-    padding: 0%;
+    justify-content: center;
 
-    background-color: white;
-}
-.areaDatos {
-    margin: auto;
-    margin-left: 0%;
-    margin-right: 0%;
-}
-.botonDatos {
-    text-align: center;
-
-    margin-left: auto;
-    margin-right: auto;
-
-    padding: 15px;
-
-    background-color: #a9a9a9;
-    color: black;
-}
-.botonLogout {
-    text-align: center;
-
-    padding: 15px;
-
-    background-color: gray;
+    height: 100vh;
 }
 
-
-/* ---------------------- Lado derecho ---------------------- */
-.data {
-    display: flex;
-    flex-direction: column;
-
-    grid-column: span 5;
-
-    padding: 10px;
-
-    gap: 10px;
+.sidebar h4 {
+    margin: 0;
 }
 
-
-.cabecera {
-    display: flex;
-    flex-direction: row;
-
-    justify-content: space-between;
-
-    padding: 10px;
-
-    border: 1px black solid;
+.sidebar button {
+    background-color: #ffffff;
+    color: #080808;
+    padding: 0.5rem;
+    border: none;
     border-radius: 4px;
+    cursor: pointer;
+    width: 6.5rem;
+    height: 3.5rem;
+    font-weight: bolder;
 }
 
+.sidebar button:hover {
+    background-color: #000;
+    border: 1px solid rgb(255, 255, 255);
+    color: #fff;
+}
 
-.searchBar {
-    display: flex;
-    flex-direction: row;
+/* Main Content */
+.main-content {
+    grid-column: span 9;
+    padding: 1rem;
+    height: 100vh;
+}
 
-    background-color: #EEEEEE;
-    border: 1px black solid;
+.main-content h3 {
+    margin: 0;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+thead th {
+    border-bottom: 1px solid #ccc;
+    padding: 0.5rem;
+}
+
+tbody td {
+    padding: 0.5rem;
+    border-bottom: 1px solid #ccc;
+}
+
+button {
+    padding: 0.5rem;
     border-radius: 4px;
+    border: none;
+    cursor: pointer;
 }
-.lupaSearchBar {
+
+button.add-button {
+    background-color: #1b1b1b;
+    color: #fff;
+    border: 1px solid #ccc;
+    width: 6.5rem;
+    height: 2.5rem;
     display: flex;
     align-items: center;
-    
-}
-.inputSearchBar {
-    border: none;
-
-    background-color: #EEEEEE;
-
-    border-top-left-radius: 0%;
-    border-bottom-left-radius: 0%;
-}
-.buttonSearchBar {
-    width: 8%;
-
-    border-top-left-radius: 0%;
-    border-bottom-left-radius: 0%;
-    border-left: 1px black solid;
-
-    background-color: #EEEEEE;
-    color: black;
+    justify-content: center;
+    margin-right: 0.5rem;
+    margin-left: 25%;
 }
 
-/* Datos */
-.usersDataContainer {
+button.add-button:hover {
+    background: #ffffff;
+    border: 1px solid #000000;
+    color: #000000;
+}
+
+button.edit-button,
+button.delete-button {
+    background-color: transparent;
+    border: 1px solid #ccc;
+    color: #000;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: left;
+    justify-content: center;
+    margin-right: 0.5rem;
+}
+
+button.edit-button:last-child {
+    margin-right: 0;
+}
+
+button.edit-button:hover {
+    background: #000000;
+    border: 1px solid #000000;
+    color: #ffffff;
+}
+
+button.delete-button {
+    border: 1px solid #dc3545;
+    color: #dc3545;
+}
+
+button.delete-button:hover {
+    background: #dc3545;
+    border: 1px solid #dc3545;
+    color: #ffffff;
+}
+
+.actions-container {
+    display: flex;
+    justify-content: flex-start;
+}
+
+/* Pagination */
+.pagination-controls {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.pagination-button {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    color: #000;
+}
+
+.pagination-button:hover {
+    background-color: #000;
+    color: #fff;
+    border: 1px solid #000;
+}
+
+.pagination button.disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.pagination span {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Modal */
+.modal-overlay-listing {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.modal-content-listing {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 800px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.choice-content {
     display: flex;
     flex-direction: column;
-
+    gap: 1rem;
 }
 
-.userData {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+.close-modal {
+    position: absolute;
+    top: 10px;
+    left: 160px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #ccc;
+}
 
-    border: 1px black solid;
+.close-modal-listing {
+    position: absolute;
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #ccc;
+}
+
+.close-modal:hover {
+    background: none;
+    /* Sin cambios en el fondo */
+    color: #000;
+}
+
+.user-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.user-form label {
+    display: flex;
+    flex-direction: column;
+    font-size: 1rem;
+    color: #333;
+}
+
+.password-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.password-container label {
+    flex: 1;
+}
+
+.user-form fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: space-evenly;
+    gap: 1rem;
+}
+
+.user-form input[type="text"],
+.user-form input[type="email"],
+.user-form input[type="password"] {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
     border-radius: 4px;
 }
 
-.numeracion {
-    
+.user-form input[type="file"] {
+    margin-top: 0.5rem;
 }
-.nombreApellido {
 
+.submit-button {
+    background-color: #000;
+    color: #fff;
+    padding: 0.75rem;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bolder;
 }
-.username {
 
+.submit-button:hover {
+    background: #fff;
+    color: #000;
+    border: 1px solid #000000;
 }
-.userEmail {
 
+.header-with-icon {
+    display: flex;
+    align-items: center;
+    /* Centra verticalmente los elementos */
+    justify-content: space-between;
+    /* Alinea el texto y el ícono */
 }
-.verAsistencias {
 
+.header-with-icon h2 {
+    margin-left: 60px;
+    /* Espacio entre el texto y el ícono */
+}
+
+.icon-trash {
+    font-size: 64px;
+    /* Tamaño del ícono */
+    color: rgb(0, 0, 0);
+    /* Cambia el color si lo deseas */
+    margin-right: 50px;
+    margin-bottom: 20px;
 }

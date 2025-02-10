@@ -54,23 +54,14 @@ const router = createBrowserRouter([
         path: "/admin/*",
         element: <AdminLayout/>,
         children: [
-            { path: "", element: <AuthProvider> <GestionUsuarios/> </AuthProvider> },
-            { path: "add", element: <Admin_newClient></Admin_newClient> }/*,
-      {
-        path: "/admin/delete"
-      },
-      {
-        path: "/admin/update"
-      }
-      */
+            { path: "", element: <AuthProvider> <GestionUsuarios/> </AuthProvider> }
         ]
-
     },
 
     //Ruteo de las páginas entrenador
     {
         path: "entrenador",
-        element: <EntrenadorAsistencias></EntrenadorAsistencias>,
+        element: <AuthProvider> <EntrenadorAsistencias/> </AuthProvider>,
         children: [
             {}
         ]

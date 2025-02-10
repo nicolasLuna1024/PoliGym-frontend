@@ -4,6 +4,12 @@ body {
     font-family: Arial, sans-serif;
 }
 
+.user-management-container {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: 1fr;
+}
+
 .container {
     display: flex;
     min-height: 100vh;
@@ -11,13 +17,17 @@ body {
 
 /* Sidebar */
 .sidebar {
-    width: 100%;
-    background-color: #020202;
-    padding: 1rem;
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    color: #fff;
+
+    flex-direction: column;
+    grid-column: span 1;
+
+    border-right: 1px solid rgb(203, 203, 203);
+
+    justify-content: center;
+
+
+    height: 100vh;
 }
 
 .sidebar h4 {
@@ -44,8 +54,9 @@ body {
 
 /* Main Content */
 .main-content {
-    flex: 1;
-    padding: 2rem;
+    grid-column: span 9;
+    padding: 1rem;
+    height: 100vh;
 }
 
 .main-content h3 {

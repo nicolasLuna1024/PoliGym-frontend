@@ -90,17 +90,14 @@ button {
     cursor: pointer;
 }
 
-button.add-button {
+.add-button {
     background-color: #1b1b1b;
     color: #fff;
     border: 1px solid #ccc;
     width: 6.5rem;
     height: 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 0.5rem;
-    margin-left: 25%;
+    
+    margin: auto;
 }
 
 button.add-button:hover {
@@ -249,12 +246,12 @@ button.delete-button:hover {
 }
 
 .close-modal-listing {
-    position: absolute;
-    margin-left: auto;
     background: none;
     border: none;
     font-size: 1.5rem;
     color: #ccc;
+    width: 50px;
+    
 }
 
 .close-modal:hover {

@@ -17,10 +17,9 @@ import { toast, ToastContainer } from "react-toastify";
 
 
 const baseFormState = {
-    username: "",
-    date: "",
-    checkIn: "",
-    checkOut: ""
+    idUser: "",
+    checkInTime: "",
+    checkOutTime: ""
 }
 
 
@@ -33,8 +32,7 @@ const EntrenadorAsistencias = () => {
 
     //Para el post, put y delete
     const [form, setForm] = useState({
-        username: "",
-        date: "",
+        idUser: "",
         checkIn: "",
         checkOut: ""
     })
@@ -63,66 +61,37 @@ const EntrenadorAsistencias = () => {
         /* Modal de listado */
     }
     const [isModalOpen, setIsModalOpen] = useState(false)
-    const openModal = (usernameSelected) => {
+    const openModal = async (usernameSelected) => {
         const usuario = users.find(user => user.username === usernameSelected);
         if (!usuario) return;
         setUsuarioSeleccionado(usuario)
-        setIsModalOpen(true)
+        setUsuarioId({idUser: usuario._id})
         setForm({username: usernameSelected})
-        console.log("isModalOpen: ", isModalOpen, usuario)
+        await handleAttendanceList(usernameSelected)
+        setIsModalOpen(true)
     }
     const closeModal = () => {
         setIsModalOpen(false)
         setForm(baseFormState)
         setUsuarioSeleccionado({})
+        setAsistencias([])
     }
 
     {
         /* Modal de agregado */
     }
     const [isModalOpenAdd, setIsModalOpenAdd] = useState(false)
+    const [usuarioId, setUsuarioId] = useState({})
     const openModalAdd = () => {
+        console.log(usuarioSeleccionado)
+        setForm({idUser: usuarioSeleccionado._id})
         setIsModalOpenAdd(true)
-        setForm({_id: usuarioSeleccionado._id})
     }
     const closeModalAdd = () => {
         setIsModalOpenAdd(false)
         setForm(baseFormState)
         setUsuarioSeleccionado({})
     }
-
-    {
-        /* Modal de eliminación */
-    }
-    const [isModalOpenDelete, setIsModalOpenDelete] = useState(false)
-    const openModalDelete = (asistenciaId) => {
-        setIsModalOpenDelete(true);
-    };
-    
-    
-    const closeModalDelete = () => {
-        setIsModalOpenDelete(false)
-        setUsuarioSeleccionado({})
-    }
-
-    {
-        /* Modal de eliminación anidado */
-    }
-    const [isModalOpenNest, setIsModalOpenNest] = useState(false)
-
-    const openModalNest = () => setIsModalOpenNest(true)
-    
-    const closeModalNest = () => setIsModalOpenNest(false)
-
-    
-
-
-
-
-
-
-
-
 
 
 
@@ -133,10 +102,10 @@ const EntrenadorAsistencias = () => {
         })
     }
 
-    const handleAttendanceList = async () => {
+    const handleAttendanceList = async (username) => {
         try
         {
-            const url = `${import.meta.env.VITE_BACKEND_URL}asistencias/buscar/${form.username}`
+            const url = `${import.meta.env.VITE_BACKEND_URL}asistencias/buscar/${username}`
             const options = {
                 headers: {
                     "Content-Type": "application/json",
@@ -144,8 +113,7 @@ const EntrenadorAsistencias = () => {
                 }
             }
             const respuesta = await axios.get(url, options)
-            console.log(respuesta)
-            setAsistencias(respuesta.data);
+            setAsistencias(respuesta.data.asistencias);
         }
         catch (error)
         {
@@ -154,11 +122,12 @@ const EntrenadorAsistencias = () => {
     };
 
     const handleSubmitPost = async (e) => {
-        //Para crear un usuario se debe enviar:
-        // username, name, lastname, email, password y role
+        //Para crear una asistencia, se debe enviar:
+        //userId, checkInTime, checkOutTime
         e.preventDefault()
+        console.log(form)
         try {
-            const url = `${import.meta.env.VITE_BACKEND_URL}users`
+            const url = `${import.meta.env.VITE_BACKEND_URL}asistencias`
             const options = {
                 headers: {
                     "Content-Type": "application/json",
@@ -167,20 +136,20 @@ const EntrenadorAsistencias = () => {
             }
             await axios.post(url, form, options)
             setForm(baseFormState)
-            toast.success("Usuario creado exitosamente")
+            toast.success("Asistencia creada exitosamente")
             setIsModalOpen(false)
             setTimeout(() => {
                 window.location.reload();
               }, 1000);
         } catch (error) {
-            toast.error("Error al crear un usuario")
+            toast.error("Error al crear una asistencia")
         }
     }
 
-    const handleDelete = async (e) => {
+    const handleDelete = async (asistenciaId) => {
         //console.log("Usuariooooooooooo: ", usuarioSeleccionado)
         try {
-            const url = `${import.meta.env.VITE_BACKEND_URL}users/${usuarioSeleccionado}`
+            const url = `${import.meta.env.VITE_BACKEND_URL}asistencias/${asistenciaId}`
             const options = {
                 headers: {
                     "Content-Type": "application/json",
@@ -189,15 +158,13 @@ const EntrenadorAsistencias = () => {
             }
     
             await axios.delete(url, options)
-            closeModalDelete()
-            closeModalNest()
-            toast.success("Usuario eliminado exitosamente")
+            toast.success("Asistencia eliminada exitosamente")
             
             setTimeout(() => {
                 window.location.reload();
               }, 1000);
         } catch (error) {
-            toast.error("Error al eliminar el usuario")
+            toast.error("Error al eliminar la asistencia")
         }
     };
     
@@ -287,19 +254,6 @@ const EntrenadorAsistencias = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {/* Fila de ingreso */}
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td>
-                                    {/*            Buscador              */}
-                                    <button className="add-button">
-                                        <FaUserPlus />
-                                    </button>
-                                </td>
-                                <td></td>
-                                <td></td>
-                            </tr>
 
                             {/* Listado de usuarios */}
                             {currentRows.map((user) => (
@@ -360,53 +314,20 @@ const EntrenadorAsistencias = () => {
 
             {/* Modal para crear asistencias */}
             {isModalOpenAdd && (
-                <div className="modal-overlay">
+                <div className="modal-overlay-create">
                     <div className="modal-content">
-                        <button className="close-modal" onClick={closeModal}>
+                        <button className="close-modal" onClick={closeModalAdd}>
                             &times;
                         </button>
-                        <h2>Nuevo Usuario</h2>
+                        <h2>Nueva asistencia</h2>
                         <form className="user-form" onSubmit={handleSubmitPost}>
                             <label>
-                                Nombre:
-                                <input type="text" placeholder="Nombre" required name="name" value={form.name || ""} onChange={handleChange} />
+                                Fecha de ingreso:
+                                <input type="date" placeholder="Fecha de ingreso" required name="checkInTime" value={form.checkInTime || ""} onChange={handleChange} />
                             </label>
                             <label>
-                                Apellido:
-                                <input type="text" placeholder="Apellido" required name="lastname" value={form.lastname || ""} onChange={handleChange} />
-                            </label>
-                            <label>
-                                Usuario:
-                                <input type="text" placeholder="Usuario" required name="username" value={form.username || ""} onChange={handleChange} />
-                            </label>
-                            <label>
-                                Email:
-                                <input type="email" placeholder="Email" required name="email" value={form.email || ""} onChange={handleChange} />
-                            </label>
-                            <div className="password-container">
-                                <label>
-                                    Contraseña:
-                                    <input type="password" placeholder="Contraseña" required name="password" value={form.password || ""} onChange={handleChange} />
-                                </label>
-                            </div>
-                            <fieldset>
-                                <legend>Rol:</legend>
-                                <label>
-                                    <input type="radio" name="role" value="administrador" required onChange={handleChange} />
-                                    Administrador
-                                </label>
-                                <label>
-                                    <input type="radio" name="role" value="entrenador" required onChange={handleChange} />
-                                    Entrenador
-                                </label>
-                                <label>
-                                    <input type="radio" name="role" value="cliente" required onChange={handleChange} />
-                                    Cliente
-                                </label>
-                            </fieldset>
-                            <label>
-                                Foto de perfil:
-                                <input type="file" accept="image/*" name="imagen" onChange={handleChange} />
+                                Fecha de salida:
+                                <input type="date" placeholder="Fecha de salida" required name="checkOutTime" value={form.checkOutTime || ""} onChange={handleChange} />
                             </label>
                             <button type="submit" className="submit-button">
                                 REGISTRAR
@@ -425,108 +346,53 @@ const EntrenadorAsistencias = () => {
             {isModalOpen && (
                 <div className="modal-overlay-listing">
                     <div className="modal-content-listing">
+                        <button className="close-modal-listing" onClick={closeModal}>
+                            &times;
+                        </button>
                         <div className="table-container">
-                            <button className="close-modal" onClick={closeModal}>
-                                &times;
-                            </button>
+                            
                             <table className="user-table">
                                 <thead>
                                     <tr>
-                                        <th>Fecha</th>
-                                        <th>Llegada</th>
-                                        <th>Salida</th>
+                                        <th>Id</th>
+                                        <th>Fecha de ingreso</th>
+                                        <th>Fecha de salida</th>
                                         <th>Tiempo</th>
+                                        <th> <FaTrash/> </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {/* Fila de ingreso */}
                                     <tr>
                                         <td></td>
-                                        <td></td>
                                         <td>
                                             {/*            Buscador              */}
-                                            <button className="add-button">
+                                            <button className="add-button" onClick={() => {
+                                                openModalAdd()
+                                            }}>
                                                 <FaUserPlus />
                                             </button>
                                         </td>
                                         <td></td>
                                         <td></td>
+                                        <td></td>
                                     </tr>
 
                                     {/* Listado de usuarios */}
-                                    {currentRows.map((user) => (
-                                        <tr key={user._id}>
-                                            <td>{user._id}</td>
-                                            <td>{user.name} {user.lastname}</td>
-                                            <td>{user.username} </td>
-                                            <td>{user.email}</td>
-                                            <td>{user.role}</td>
-                                            <td>
-                                                <button className="edit-button" onClick={() => {
-                                                    openModal(user.username)
-                                                    }}>
-                                                    <FaEye />
-                                                </button>
-                                            </td>
+                                    {asistencias.map((asistencia) => (
+                                        <tr key={asistencia._id}>
+                                            <td>{asistencia._id}</td>
+                                            <td>{asistencia.checkInTime}</td>
+                                            <td>{asistencia.checkOutTime} </td>
+                                            <td>{"-------"}</td>
+                                            <td> <button onClick={()=>{
+                                                handleDelete(asistencia._id)
+                                            }}><FaTrash/></button> </td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
-                    </div>
-                </div>
-            )}
-
-
-
-
-
-
-
-
-            {/* Modal para eliminar usuarios */}
-            {isModalOpenDelete && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <button className="close-modal" onClick={closeModalDelete}>
-                            &times;
-                        </button>
-                        <h2>ESTAS SEGURO DE QUERER ELIMINAR ESTE REGISTRO?</h2>
-
-                        <div className="choice-content">
-                            <button className="submit-button" onClick={openModalNest}>
-                                SI
-                            </button>
-
-                            <button className="submit-button" onClick={closeModalDelete}>
-                                NO
-                            </button>
-                        </div>
-                        <h4 style={{ color: "red", textAlign: "center" }}>
-                            *NO PODRÁ REVERTIR ESTA ACCION*
-                        </h4>
-                    </div>
-                </div>
-            )}
-
-
-
-
-
-
-            {/* Modal de eliminación de usuario anidado */}
-            {isModalOpenNest && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <div className="header-with-icon">
-                            <h2>ELIMINADO</h2>
-                            <FaTrash className="icon-trash" />
-                        </div>
-                        <button
-                            className="submit-button"
-                            onClick={handleDelete}>
-                            CONTINUAR
-                        </button>
                     </div>
                 </div>
             )}

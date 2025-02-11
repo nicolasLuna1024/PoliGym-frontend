@@ -34,7 +34,8 @@ const GestionUsuarios = () => {
         lastname: "",
         username: "",
         email: "",
-        password: ""
+        password: "",
+        imagen: null
     })
     //Para el get
     const [users, setUsers] = useState([])
@@ -122,6 +123,13 @@ const GestionUsuarios = () => {
         })
     }
 
+    const handleFileChange = async (e) => {
+        setForm({
+            ...form,
+            imagen: e.target.files[0]
+        })
+    }
+
     const handleSubmitPost = async (e) => {
         //Para crear un usuario se debe enviar:
         // username, name, lastname, email, password y role
@@ -152,18 +160,32 @@ const GestionUsuarios = () => {
         e.preventDefault()
         try {
             const url = `${import.meta.env.VITE_BACKEND_URL}users/${usuarioSeleccionado.username}`
+            
             const options = {
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "multipart/form-data",
                     Authorization: `Bearer ${token}`
                 }
             }
-
+            
             const filteredForm = Object.fromEntries(
-                Object.entries(form).filter(([_, value]) => value.trim() !== "")
+                Object.entries(form).filter(([_, value]) => 
+                  typeof value === "string" ? value.trim() !== "" : value !== null && value !== undefined
+                )
             );
+              
+            console.log("----------------------")
+            
+            const formData = new FormData()
+            
+            if (filteredForm.name) formData.append("name", filteredForm.name)
+            if (filteredForm.lastname) formData.append("lastname", filteredForm.lastname)
+            if (filteredForm.username) formData.append("username", filteredForm.username)
+            if (filteredForm.email) formData.append("email", filteredForm.email)
+            if (filteredForm.password) formData.append("password", filteredForm.password)
+            if (filteredForm.imagen) formData.append("imagen", filteredForm.imagen)
 
-            await axios.put(url, filteredForm, options)
+            await axios.put(url, formData, options)
 
             closeModalEdit()
             toast.success("Usuario actualizado exitosamente")
@@ -429,12 +451,12 @@ const GestionUsuarios = () => {
                                 </label>
 
                             </div>
-                            {/*
+                            
                             <label>
                                 Foto de perfil:
-                                <input type="file" accept="image/*" />
+                                <input type="file" accept="image/*" name="imagen" onChange={handleFileChange} />
                             </label>
-                            */}
+                            
                             <button type="submit" className="submit-button">
                                 ACTUALIZAR
                             </button>

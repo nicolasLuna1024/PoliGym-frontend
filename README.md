@@ -79,7 +79,7 @@ El frontend está desplegado en: [https://poli-gym-frontend.vercel.app/(#)
 * [x] Configuración del entorno de desarrollo  
 * [x] Integración con API de autenticación  
 * [x] Consumo de API para gestión de usuarios  
-* [x] Consumo de API para rutinas y progresos  
+* [x] Consumo de API para progresos  
 * [x] Optimización de UI con Tailwind  
 * [x] Pruebas y Deploy  
 

@@ -39,7 +39,7 @@
 
 - Autenticación y control de sesiones
 - Consumo de API para gestión de usuarios
-- Consumo de API para asistencias, rutinas y progresos
+- Consumo de API para asistencias y progresos
 - UI/UX optimizada con Tailwind CSS
 
 <!-- Run Locally -->
@@ -71,7 +71,7 @@ Ejecutar la aplicación
 
 ### :triangular_flag_on_post: Deployment
 
-El frontend está desplegado en: [https://poligym-frontend.app](#)  
+El frontend está desplegado en: [https://poli-gym-frontend.vercel.app/(#)  
 
 <!-- Roadmap -->
 ## :compass: Roadmap

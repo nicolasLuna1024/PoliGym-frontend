@@ -173,8 +173,6 @@ const GestionUsuarios = () => {
                   typeof value === "string" ? value.trim() !== "" : value !== null && value !== undefined
                 )
             );
-              
-            console.log("----------------------")
             
             const formData = new FormData()
             

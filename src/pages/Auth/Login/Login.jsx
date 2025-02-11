@@ -29,6 +29,7 @@ const Login = () => {
             const respuesta = await axios.post(url, form)
             //Extrae el token y los datos de autenticacións
             const {token: newToken, user} = respuesta.data
+
             //Alamacena el token en el contexto
             setAuth({ ...auth, user });
             setToken(newToken);
@@ -40,11 +41,23 @@ const Login = () => {
 
             // Muestra un mensaje de éxito
             toast.success("Inicio de sesión exitoso");
+
             
-            console.log("Auth: ", respuesta.data)
+            //console.log("Respuesta.data: ", respuesta.data)
             console.log(respuesta.data.token)
             //Redirige a la página de cliente
-            navigate("/cliente")
+            if (respuesta.data.role === "cliente")
+            {
+                navigate(`/cliente/progresos/${respuesta.data.username}`)
+            }
+            else if (respuesta.data.role === "administrador")
+            {
+                navigate(`/admin`)
+            }
+            else if (respuesta.data.role === "entrenador")
+            {
+                navigate(`/entrenador`)
+            }
         } catch (error) {
             toast.error("Error al iniciar sesión:",error);
             toast.error("Creedenciales incorrectas");

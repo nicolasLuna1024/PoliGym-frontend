@@ -83,7 +83,7 @@ const router = createBrowserRouter([
                 </AuthProvider>
             },
             {
-                path: "entrenamientos/:username",
+                path: "rutinas/:username",
                 element: <ClienteEntrenamientos></ClienteEntrenamientos>
             }
 

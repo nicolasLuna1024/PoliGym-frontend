@@ -9,7 +9,7 @@ const ForgotPassword = () => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
-            const url = `${import.meta.env.VITE_BACKEND_URL}/auth/recovery-password-mailing`
+            const url = `${import.meta.env.VITE_BACKEND_URL}auth/recovery-password-mailing`
 
             await axios.post(url, email)
 

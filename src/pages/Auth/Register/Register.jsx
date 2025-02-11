@@ -23,7 +23,7 @@ const Register = () => {
         e.preventDefault();
         console.log(formData)
         try {
-            const url = `${import.meta.env.VITE_BACKEND_URL}/auth/register`
+            const url = `${import.meta.env.VITE_BACKEND_URL}auth/register`
             const respuesta = await axios.post(url, {...formData});
         
             setFormData({

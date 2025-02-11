@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import axios from "axios"
 import AuthContext from "../../../contexts/AuthProvider";
 import { toast, ToastContainer } from "react-toastify";
-import { toast } from "react-toastify"; // Notificaciones
 
 
 
@@ -489,4 +488,4 @@ const exerciseItemStyle = {
   borderBottom: '1px solid #ddd',
 };
 
-export default CLi;
+export default ClienteEntrenamientos;

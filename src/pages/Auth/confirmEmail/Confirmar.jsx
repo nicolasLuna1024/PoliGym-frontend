@@ -13,7 +13,7 @@ function Confirmar() {
     
     const verifyToken = async () => {
         try {
-            const url = `${import.meta.env.VITE_BACKEND_URL}/auth/confirm/${token}`
+            const url = `${import.meta.env.VITE_BACKEND_URL}auth/confirm/${token}`
             await axios.get(url)
             toast.success("Email confirmado exitosamente")
         }

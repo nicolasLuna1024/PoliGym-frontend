@@ -18,7 +18,7 @@ import AdminLayout from "./pages/Admin/AdminLayout/AdminLayout.jsx";
 import EntrenadorAsistencias from "./pages/Entrenador/EntrenadorAsistencias/EntrenadorAsistencias.jsx";
 
 // import Navbar from "./components/navegacion/navbar.jsx";
-import ClienteEntrenamientos from "./pages/Cliente/ClienteEntrenamientos/ClienteEntrenamientos.jsx";
+// import ClienteEntrenamientos from "./pages/Cliente/ClienteEntrenamientos/ClienteEntrenamientos.jsx";
 import { AuthProvider } from "./contexts/AuthProvider.jsx";
 import Confirmar from "./pages/Auth/confirmEmail/Confirmar.jsx";
 import ConfirmToken from "./pages/Auth/ConfirmToken/ConfirmToken.jsx";
@@ -84,7 +84,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "rutinas/:username",
-                element: <ClienteEntrenamientos></ClienteEntrenamientos>
+                // element: <ClienteEntrenamientos></ClienteEntrenamientos>
             }
 
         ]

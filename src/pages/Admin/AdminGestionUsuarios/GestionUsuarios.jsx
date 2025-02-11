@@ -400,10 +400,6 @@ const GestionUsuarios = () => {
                                     Cliente
                                 </label>
                             </fieldset>
-                            <label>
-                                Foto de perfil:
-                                <input type="file" accept="image/*" name="imagen" onChange={handleChange} />
-                            </label>
                             <button type="submit" className="submit-button">
                                 REGISTRAR
                             </button>
